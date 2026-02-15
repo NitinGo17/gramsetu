@@ -1,0 +1,5148 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GRAMSETU | Smart Government Scheme Access Platform</title>
+
+    
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    
+
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+
+    <script>
+
+        tailwind.config = {
+
+            theme: {
+
+                extend: {
+
+                    colors: {
+
+                        gov: {
+
+                            light: '#E8F5E9',   // Light Green Background
+
+                            soft: '#C8E6C9',    // Soft Green
+
+                            medium: '#A5D6A7',  // Gentle Green
+
+                            primary: '#2E7D32', // Official Dark Green
+
+                            accent: '#66BB6A',  // Soft Accent
+
+                            text: '#2E2E2E',    // Dark Gray Text
+
+                            muted: '#546E7A',   // Muted Text
+
+                            warning: '#FF9800', // Warning Orange
+
+                            danger: '#D32F2F',  // Error Red
+
+                            white: '#FFFFFF',
+
+                            bg: '#F5F7FA'       // Very Light Gray
+
+                        }
+
+                    },
+
+                    fontFamily: {
+
+                        sans: ['Poppins', 'sans-serif'],
+
+                        indian: ['Hind', 'sans-serif']
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    </script>
+
+
+
+    <style>
+
+        /* ========================================== */
+
+        /* BASE STYLES & RESET (ORIGINAL) */
+
+        /* ========================================== */
+
+        body {
+
+            font-family: 'Poppins', sans-serif;
+
+            background-color: #F5F7FA;
+
+            color: #2E2E2E;
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        /* SIMPLE MODE OVERRIDES (Toggled via JS) */
+
+        body.simple-mode {
+
+            font-size: 18px !important;
+
+        }
+
+        body.simple-mode button {
+
+            padding: 16px 32px !important;
+
+            font-weight: 700 !important;
+
+            transform: scale(1.05);
+
+        }
+
+        body.simple-mode .card {
+
+            border: 2px solid #2E7D32 !important;
+
+            box-shadow: none !important;
+
+        }
+
+        body.simple-mode .text-sm {
+
+            font-size: 1rem !important;
+
+        }
+
+
+
+        /* LOW NETWORK MODE (Toggled via JS) */
+
+        body.low-network * {
+
+            animation: none !important;
+
+            transition: none !important;
+
+            box-shadow: none !important;
+
+        }
+
+
+
+        /* UTILITIES */
+
+        .card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+            transition: transform 0.2s, box-shadow 0.2s;
+
+            border: 1px solid #E2E8F0;
+
+        }
+
+        .card:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+        }
+
+        
+
+        /* OFFICIAL BADGE ANIMATION */
+
+        @keyframes pulse-green {
+
+            0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7); }
+
+            70% { box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); }
+
+            100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+
+        }
+
+        .verified-badge {
+
+            animation: pulse-green 2s infinite;
+
+        }
+
+
+
+        /* SPINNER */
+
+        .loader {
+
+            border: 4px solid #f3f3f3;
+
+            border-top: 4px solid #2E7D32;
+
+            border-radius: 50%;
+
+            width: 30px;
+
+            height: 30px;
+
+            animation: spin 1s linear infinite;
+
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+
+
+        /* HIDE SCROLLBAR FOR HORIZONTAL LISTS */
+
+        .no-scrollbar::-webkit-scrollbar {
+
+            display: none;
+
+        }
+
+        .no-scrollbar {
+
+            -ms-overflow-style: none;
+
+            scrollbar-width: none;
+
+        }
+
+        
+
+        /* NAVIGATION ACTIVE STATE */
+
+        .nav-item.active {
+
+            color: #2E7D32;
+
+            border-bottom: 2px solid #2E7D32;
+
+            font-weight: 600;
+
+        }
+
+
+
+        /* MODAL ANIMATION */
+
+        .modal-enter {
+
+            opacity: 0;
+
+            transform: scale(0.9);
+
+        }
+
+        .modal-enter-active {
+
+            opacity: 1;
+
+            transform: scale(1);
+
+            transition: opacity 300ms, transform 300ms;
+
+        }
+
+
+
+        /* ========================================== */
+
+        /* EXPANSION STYLES (APPENDED) */
+
+        /* ========================================== */
+
+
+
+        /* SMS SIMULATION CONTAINER */
+
+        #sms-simulation-layer {
+
+            position: fixed;
+
+            top: 20px;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            z-index: 9999;
+
+            width: 90%;
+
+            max-width: 400px;
+
+            pointer-events: none;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+        }
+
+
+
+        .sms-toast {
+
+            background: rgba(0, 0, 0, 0.85);
+
+            backdrop-filter: blur(8px);
+
+            color: white;
+
+            padding: 16px;
+
+            border-radius: 20px;
+
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 12px;
+
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+            animation: slideDownSMS 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+
+            pointer-events: auto;
+
+            border-left: 4px solid #2E7D32;
+
+            max-height: 0;
+
+            opacity: 0;
+
+        }
+
+
+
+        @keyframes slideDownSMS {
+
+            0% { transform: translateY(-50px); opacity: 0; max-height: 0; padding: 0; }
+
+            20% { max-height: 100px; padding: 16px; }
+
+            100% { transform: translateY(0); opacity: 1; max-height: 200px; }
+
+        }
+
+
+
+        .sms-toast.hide {
+
+            animation: slideUpSMS 0.5s ease forwards;
+
+        }
+
+
+
+        @keyframes slideUpSMS {
+
+            to { transform: translateY(-50px); opacity: 0; margin-top: -100px; }
+
+        }
+
+
+
+        /* NOTIFICATION PANEL (Slide Out) */
+
+        #notification-panel {
+
+            position: fixed;
+
+            top: 0;
+
+            right: -400px; /* Hidden */
+
+            width: 350px;
+
+            height: 100vh;
+
+            background: #F5F7FA;
+
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+
+            z-index: 200;
+
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+
+        #notification-panel.active {
+
+            right: 0;
+
+        }
+
+
+
+        .notif-header {
+
+            background: #2E7D32;
+
+            color: white;
+
+            padding: 20px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        }
+
+
+
+        .notif-content {
+
+            flex: 1;
+
+            overflow-y: auto;
+
+            padding: 10px;
+
+        }
+
+
+
+        .notif-item {
+
+            background: white;
+
+            margin-bottom: 10px;
+
+            padding: 15px;
+
+            border-radius: 12px;
+
+            border-left: 4px solid #ccc;
+
+            position: relative;
+
+            transition: transform 0.2s;
+
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+        }
+
+
+
+        .notif-item:hover {
+
+            transform: scale(1.02);
+
+        }
+
+
+
+        .notif-item.urgent { border-left-color: #D32F2F; }
+
+        .notif-item.info { border-left-color: #1976D2; }
+
+        .notif-item.success { border-left-color: #2E7D32; }
+
+
+
+        /* MOBILE BOTTOM NAV */
+
+        .mobile-bottom-nav {
+
+            display: none;
+
+            position: fixed;
+
+            bottom: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            background: white;
+
+            border-top: 1px solid #e0e0e0;
+
+            z-index: 100;
+
+            justify-content: space-around;
+
+            padding: 10px 0;
+
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+
+        }
+
+
+
+        @media (max-width: 768px) {
+
+            .mobile-bottom-nav { display: flex; }
+
+            /* Adjust main container to not be hidden by nav */
+
+            #app { padding-bottom: 80px; }
+
+            /* Hide simulated voice button on mobile to prevent overlap */
+
+            button[onclick="app.activateVoiceAssistant()"] { bottom: 80px; }
+
+        }
+
+
+
+        .mobile-nav-item {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            color: #757575;
+
+            font-size: 10px;
+
+            background: none;
+
+            border: none;
+
+        }
+
+
+
+        .mobile-nav-item.active {
+
+            color: #2E7D32;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .mobile-nav-item i {
+
+            font-size: 20px;
+
+            margin-bottom: 4px;
+
+        }
+
+
+
+        /* LANGUAGE PANEL OVERLAY */
+
+        #language-overlay {
+
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(0,0,0,0.5);
+
+            z-index: 300;
+
+            display: none;
+
+            justify-content: center;
+
+            align-items: center;
+
+            backdrop-filter: blur(3px);
+
+        }
+
+
+
+        .lang-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 15px;
+
+            width: 100%;
+
+        }
+
+
+
+        .lang-btn {
+
+            padding: 15px;
+
+            border: 2px solid #e0e0e0;
+
+            border-radius: 10px;
+
+            background: white;
+
+            text-align: center;
+
+            font-weight: bold;
+
+            transition: all 0.2s;
+
+        }
+
+
+
+        .lang-btn:hover, .lang-btn.active {
+
+            border-color: #2E7D32;
+
+            background: #E8F5E9;
+
+            color: #2E7D32;
+
+        }
+
+
+
+        /* DOCUMENT VERIFICATION STATUS PANEL */
+
+        .doc-status-row {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 12px;
+
+            border-bottom: 1px solid #f0f0f0;
+
+        }
+
+
+
+        .doc-status-row:last-child { border-bottom: none; }
+
+
+
+        .doc-icon {
+
+            width: 32px;
+
+            height: 32px;
+
+            background: #F5F7FA;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin-right: 12px;
+
+        }
+
+
+
+        /* Application Tracker Timeline Vertical */
+
+        .timeline-v {
+
+            position: relative;
+
+            padding-left: 20px;
+
+            border-left: 2px solid #e0e0e0;
+
+            margin-left: 10px;
+
+        }
+
+        
+
+        .timeline-item {
+
+            position: relative;
+
+            margin-bottom: 24px;
+
+        }
+
+        
+
+        .timeline-dot {
+
+            position: absolute;
+
+            left: -27px;
+
+            top: 0;
+
+            width: 16px;
+
+            height: 16px;
+
+            border-radius: 50%;
+
+            background: #fff;
+
+            border: 4px solid #ccc;
+
+        }
+
+        
+
+        .timeline-item.completed .timeline-dot {
+
+            border-color: #2E7D32;
+
+            background: #2E7D32;
+
+        }
+
+        
+
+        .timeline-item.current .timeline-dot {
+
+            border-color: #FF9800;
+
+            background: #fff;
+
+        }
+
+    </style>
+
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+
+
+    <header class="bg-white border-b-4 border-gov-primary sticky top-0 z-50 shadow-sm">
+
+        <div class="bg-gov-light py-2 px-4 md:px-8 flex justify-between items-center text-xs md:text-sm text-gov-text">
+
+            <div class="flex items-center gap-2">
+
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Satyamev Jayate" class="h-8 md:h-10">
+
+                <div class="flex flex-col">
+
+                    <span class="font-bold text-gov-primary">Government of India</span>
+
+                    <span class="text-[10px] text-gray-600">Ministry of Rural Development</span>
+
+                </div>
+
+            </div>
+
+            <div class="flex items-center gap-4">
+
+                <button onclick="app.toggleLowNetwork()" class="hidden md:flex items-center gap-1 hover:text-gov-primary">
+
+                    <i class="fas fa-wifi text-gov-primary"></i> <span id="lbl-network">Network Mode</span>
+
+                </button>
+
+                <button onclick="app.toggleSimpleMode()" class="flex items-center gap-1 bg-white border border-gov-primary px-2 py-1 rounded hover:bg-gov-light transition">
+
+                    <i class="fas fa-universal-access text-gov-primary"></i> 
+
+                    <span class="font-bold">Simple Mode</span>
+
+                </button>
+
+                <div class="relative">
+
+                    <select id="languageSelector" onchange="app.setLanguage(this.value)" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gov-primary focus:border-gov-primary block w-full p-1.5">
+
+                        <option value="en">English</option>
+
+                        <option value="hi">हिंदी (Hindi)</option>
+
+                        <option value="bn">বাংলা (Bengali)</option>
+
+                        <option value="te">తెలుగు (Telugu)</option>
+
+                        <option value="mr">मराठी (Marathi)</option>
+
+                        <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+
+                        <option value="gu">ગુજરાતી (Gujarati)</option>
+
+                        <option value="kn">ಕન્નડ (Kannada)</option>
+
+                        <option value="ml">മലയാളം (Malayalam)</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <nav class="bg-white px-4 md:px-8 py-3 flex justify-between items-center shadow-sm">
+
+            <a href="#" onclick="router.navigate('home')" class="flex items-center gap-2 group">
+
+                <div class="w-10 h-10 bg-gov-primary rounded-full flex items-center justify-center text-white text-xl font-bold group-hover:bg-gov-accent transition">
+
+                    <i class="fas fa-hands-holding-circle"></i>
+
+                </div>
+
+                <div class="flex flex-col">
+
+                    <span class="text-xl md:text-2xl font-bold text-gov-primary tracking-tight">GRAM<span class="text-gov-accent">SETU</span></span>
+
+                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Bridging Rural India</span>
+
+                </div>
+
+            </a>
+
+
+
+            <div class="hidden md:flex items-center gap-6">
+
+                <button onclick="router.navigate('home')" class="nav-item px-3 py-2 text-gray-700 hover:text-gov-primary transition font-medium" data-translate="nav_home">Home</button>
+
+                <button onclick="router.navigate('schemes')" class="nav-item px-3 py-2 text-gray-700 hover:text-gov-primary transition font-medium" data-translate="nav_schemes">All Schemes</button>
+
+                <button onclick="router.navigate('dashboard')" class="nav-item px-3 py-2 text-gray-700 hover:text-gov-primary transition font-medium" data-translate="nav_dashboard">My Dashboard</button>
+
+                <button onclick="router.navigate('guide')" class="nav-item px-3 py-2 text-gray-700 hover:text-gov-primary transition font-medium" data-translate="nav_guide">Help Guide</button>
+
+            </div>
+
+
+
+            <div class="flex items-center gap-3">
+
+                <div id="authSection" class="hidden md:block">
+
+                    </div>
+
+                <button class="md:hidden text-2xl text-gov-primary p-2" onclick="app.toggleMobileMenu()">
+
+                    <i class="fas fa-bars"></i>
+
+                </button>
+
+            </div>
+
+        </nav>
+
+        
+
+        <div id="mobileMenu" class="hidden md:hidden bg-gov-light border-t border-gray-200">
+
+            <div class="flex flex-col p-4 gap-3">
+
+                <button onclick="router.navigate('home'); app.toggleMobileMenu()" class="text-left font-medium p-2 rounded hover:bg-white">Home</button>
+
+                <button onclick="router.navigate('schemes'); app.toggleMobileMenu()" class="text-left font-medium p-2 rounded hover:bg-white">All Schemes</button>
+
+                <button onclick="router.navigate('dashboard'); app.toggleMobileMenu()" class="text-left font-medium p-2 rounded hover:bg-white">Dashboard</button>
+
+                <button onclick="router.navigate('digilocker'); app.toggleMobileMenu()" class="text-left font-medium p-2 rounded hover:bg-white">DigiLocker</button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <main id="app" class="flex-grow container mx-auto px-4 py-6 md:px-8 max-w-7xl">
+
+        </main>
+
+
+
+    <div id="toast-container" class="fixed bottom-20 right-4 z-50 flex flex-col gap-2"></div>
+
+
+
+    <button onclick="app.activateVoiceAssistant()" class="fixed bottom-6 right-6 w-14 h-14 bg-gov-primary text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition z-40 border-4 border-gov-light" aria-label="Voice Assistant">
+
+        <i class="fas fa-microphone text-xl"></i>
+
+    </button>
+
+
+
+    <div id="notification-panel">
+
+        <div class="notif-header">
+
+            <h3 class="font-bold text-lg"><i class="fas fa-bell"></i> <span data-translate="hdr_notifications">Notifications</span></h3>
+
+            <button onclick="Expander.toggleNotifications()" class="text-white hover:text-gray-200">
+
+                <i class="fas fa-times text-xl"></i>
+
+            </button>
+
+        </div>
+
+        <div class="bg-green-50 p-3 text-xs text-green-800 border-b border-green-100 flex justify-between items-center">
+
+            <span data-translate="lbl_realtime">Real-time alerts active</span>
+
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+
+        </div>
+
+        <div id="notif-list-container" class="notif-content">
+
+            </div>
+
+        <div class="p-4 border-t border-gray-200 bg-white">
+
+            <button onclick="Expander.clearNotifications()" class="w-full py-2 text-sm text-gray-500 hover:text-red-500" data-translate="btn_clear_all">Clear All History</button>
+
+        </div>
+
+    </div>
+
+
+
+    <div id="sms-simulation-layer"></div>
+
+
+
+    <div class="mobile-bottom-nav">
+
+        <button onclick="router.navigate('home')" class="mobile-nav-item active">
+
+            <i class="fas fa-home"></i>
+
+            <span data-translate="nav_home">Home</span>
+
+        </button>
+
+        <button onclick="router.navigate('schemes')" class="mobile-nav-item">
+
+            <i class="fas fa-search"></i>
+
+            <span data-translate="nav_schemes">Schemes</span>
+
+        </button>
+
+        <button onclick="Expander.toggleNotifications()" class="mobile-nav-item">
+
+            <div class="relative">
+
+                <i class="fas fa-bell"></i>
+
+                <span id="mobile-badge" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white hidden"></span>
+
+            </div>
+
+            <span data-translate="hdr_notifications">Alerts</span>
+
+        </button>
+
+        <button onclick="router.navigate('dashboard')" class="mobile-nav-item">
+
+            <i class="fas fa-user-circle"></i>
+
+            <span data-translate="nav_dashboard">Profile</span>
+
+        </button>
+
+    </div>
+
+
+
+    <footer class="bg-gov-primary text-white pt-10 pb-6 mt-auto">
+
+        <div class="container mx-auto px-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+
+                <div>
+
+                    <h3 class="text-xl font-bold mb-4">GRAMSETU</h3>
+
+                    <p class="text-gov-soft text-sm">Empowering rural India with digital access to government benefits. A unified platform for farmers, artisans, and citizens.</p>
+
+                </div>
+
+                <div>
+
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+
+                    <ul class="space-y-2 text-sm text-gov-soft">
+
+                        <li><a href="#" onclick="router.navigate('home')">Home</a></li>
+
+                        <li><a href="#" onclick="router.navigate('schemes')">Find Schemes</a></li>
+
+                        <li><a href="#" onclick="router.navigate('dashboard')">Track Application</a></li>
+
+                    </ul>
+
+                </div>
+
+                <div>
+
+                    <h4 class="font-bold mb-4">Government</h4>
+
+                    <ul class="space-y-2 text-sm text-gov-soft">
+
+                        <li>National Portal of India</li>
+
+                        <li>Digital India</li>
+
+                        <li>MyGov.in</li>
+
+                    </ul>
+
+                </div>
+
+                <div>
+
+                    <h4 class="font-bold mb-4">Helpline</h4>
+
+                    <p class="text-2xl font-bold text-white mb-2">1800-11-5555</p>
+
+                    <p class="text-xs text-gov-soft">Available 24/7 (Toll Free)</p>
+
+                    <div class="mt-4 flex gap-4">
+
+                        <i class="fab fa-twitter text-xl cursor-pointer"></i>
+
+                        <i class="fab fa-facebook text-xl cursor-pointer"></i>
+
+                        <i class="fab fa-youtube text-xl cursor-pointer"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="border-t border-green-800 pt-6 text-center text-xs text-gov-soft">
+
+                <p>&copy; 2026 GramSetu | Ministry of Rural Development | Government of India</p>
+
+                <p class="mt-1">Content is indicative for prototype purposes.</p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+    <script>
+
+        /**
+
+         * GRAMSETU - CORE APPLICATION LOGIC
+
+         * Contains: State Management, Scheme Database, UI Rendering, Business Logic
+
+         */
+
+
+
+        // ==========================================
+
+        // 1. DATA & CONSTANTS
+
+        // ==========================================
+
+        
+
+        const SCHEMES_DB = [
+
+            {
+
+                id: 'pm-kisan',
+
+                name: 'PM Kisan Samman Nidhi',
+
+                category: 'Farmer',
+
+                description: 'Financial support of ₹6,000 per year to landholding farmer families.',
+
+                benefits: ['₹6,000 per year', 'Direct Bank Transfer', 'Installment basis'],
+
+                eligibility: { occupation: 'Farmer', maxIncome: 10000000, landOwner: true },
+
+                deadline: '2026-03-31',
+
+                docsRequired: ['Aadhaar', 'Land Record', 'Bank Passbook'],
+
+                trustLevel: 'Central Govt',
+
+                matchScore: 0
+
+            },
+
+            {
+
+                id: 'ayushman',
+
+                name: 'Ayushman Bharat Yojana',
+
+                category: 'Health',
+
+                description: 'Health insurance coverage of up to ₹5 Lakh per family per year.',
+
+                benefits: ['Free Treatment', '₹5 Lakh Cover', 'Cashless Hospitalization'],
+
+                eligibility: { occupation: 'Any', maxIncome: 250000, ageMin: 0 },
+
+                deadline: '2026-12-31',
+
+                docsRequired: ['Aadhaar', 'Ration Card', 'Income Certificate'],
+
+                trustLevel: 'Central Govt',
+
+                matchScore: 0
+
+            },
+
+            {
+
+                id: 'soil-health',
+
+                name: 'Soil Health Card Scheme',
+
+                category: 'Farmer',
+
+                description: 'Get information about the nutrient status of your soil to improve yield.',
+
+                benefits: ['Soil Test Report', 'Fertilizer Recommendations', 'Higher Yield'],
+
+                eligibility: { occupation: 'Farmer', maxIncome: 10000000 },
+
+                deadline: '2026-06-30',
+
+                docsRequired: ['Aadhaar', 'Land Details'],
+
+                trustLevel: 'Agriculture Dept',
+
+                matchScore: 0
+
+            },
+
+            {
+
+                id: 'atal-pension',
+
+                name: 'Atal Pension Yojana',
+
+                category: 'Pension',
+
+                description: 'Pension scheme for citizens in the unorganized sector.',
+
+                benefits: ['Guaranteed Pension', 'Govt Contribution', 'Social Security'],
+
+                eligibility: { occupation: 'Any', ageMin: 18, ageMax: 40 },
+
+                deadline: '2026-05-15',
+
+                docsRequired: ['Aadhaar', 'Savings Bank Account'],
+
+                trustLevel: 'Central Govt',
+
+                matchScore: 0
+
+            },
+
+            {
+
+                id: 'pm-awas',
+
+                name: 'PM Awas Yojana (Gramin)',
+
+                category: 'Housing',
+
+                description: 'Financial assistance for construction of pucca house for homeless.',
+
+                benefits: ['₹1.20 Lakh Support', 'Toilet Construction Support', 'MNREGA Wages'],
+
+                eligibility: { occupation: 'Any', maxIncome: 150000, houseType: 'Kucha' },
+
+                deadline: '2026-11-30',
+
+                docsRequired: ['Aadhaar', 'Income Certificate', 'Job Card'],
+
+                trustLevel: 'Rural Dev Ministry',
+
+                matchScore: 0
+
+            },
+
+            {
+
+                id: 'kisan-credit',
+
+                name: 'Kisan Credit Card (KCC)',
+
+                category: 'Finance',
+
+                description: 'Timely credit to farmers for agricultural needs.',
+
+                benefits: ['Low Interest Loan', 'Flexible Repayment', 'Insurance Coverage'],
+
+                eligibility: { occupation: 'Farmer', ageMin: 18 },
+
+                deadline: '2026-04-01',
+
+                docsRequired: ['Land Record', 'Crops Detail'],
+
+                trustLevel: 'RBI / Govt',
+
+                matchScore: 0
+
+            }
+
+        ];
+
+
+
+        const TRANSLATIONS = {
+
+            en: {
+
+                welcome: "Welcome to GramSetu",
+
+                subtitle: "Connecting Every Village to Government Benefits",
+
+                check_eligibility: "Check Eligibility",
+
+                connect_digilocker: "Connect DigiLocker",
+
+                my_dashboard: "My Dashboard",
+
+                nav_home: "Home",
+
+                nav_schemes: "Schemes",
+
+                nav_dashboard: "Dashboard",
+
+                nav_guide: "Guide",
+
+                lbl_name: "Full Name",
+
+                lbl_age: "Age",
+
+                lbl_occ: "Occupation",
+
+                lbl_inc: "Annual Income",
+
+                lbl_state: "State",
+
+                btn_find: "Find My Schemes",
+
+                sec_recommended: "Recommended for You",
+
+                sec_all: "All Government Schemes",
+
+                status_verified: "Verified",
+
+                status_pending: "Pending",
+
+                msg_eligible: "You are eligible!",
+
+                msg_connect_dl: "Connect DigiLocker to auto-verify."
+
+            },
+
+            hi: {
+
+                welcome: "ग्रामसेतु में आपका स्वागत है",
+
+                subtitle: "हर गाँव को सरकारी लाभों से जोड़ना",
+
+                check_eligibility: "पात्रता जाँचें",
+
+                connect_digilocker: "डिजीलॉकर कनेक्ट करें",
+
+                my_dashboard: "मेरा डैशबोर्ड",
+
+                nav_home: "होम",
+
+                nav_schemes: "योजनाएं",
+
+                nav_dashboard: "डैशबोर्ड",
+
+                nav_guide: "गाइड",
+
+                lbl_name: "पूरा नाम",
+
+                lbl_age: "आयु",
+
+                lbl_occ: "व्यवसाय",
+
+                lbl_inc: "वार्षिक आय",
+
+                lbl_state: "राज्य",
+
+                btn_find: "मेरी योजनाएं खोजें",
+
+                sec_recommended: "आपके लिए अनुशंसित",
+
+                sec_all: "सभी सरकारी योजनाएं",
+
+                status_verified: "सत्यापित",
+
+                status_pending: "लंबित",
+
+                msg_eligible: "आप पात्र हैं!",
+
+                msg_connect_dl: "स्वतः सत्यापन के लिए डिजीलॉकर जोड़ें।"
+
+            }
+
+        };
+
+
+
+        const CSC_CENTERS = [
+
+            { name: "Gram Panchayat Kendra, Rampur", dist: "1.2 km", status: "Open" },
+
+            { name: "Common Service Center, Block B", dist: "3.5 km", status: "Busy" },
+
+            { name: "Digital Seva, Market Road", dist: "5.0 km", status: "Open" }
+
+        ];
+
+
+
+        // ==========================================
+
+        // 2. STATE MANAGEMENT (LOCALSTORAGE)
+
+        // ==========================================
+
+        
+
+        class Store {
+
+            constructor() {
+
+                this.state = this.loadState();
+
+            }
+
+
+
+            getInitialState() {
+
+                return {
+
+                    user: null, // { name, age, occupation, income, state }
+
+                    digiLocker: {
+
+                        connected: false,
+
+                        documents: [], // { name, type, date, verified: true }
+
+                        aadhaarVerified: false,
+
+                        incomeVerified: false,
+
+                        farmerVerified: false
+
+                    },
+
+                    subscriptions: [], // [schemeId]
+
+                    applications: [], // { schemeId, appId, status, date, steps: [] }
+
+                    settings: {
+
+                        language: 'en',
+
+                        simpleMode: false,
+
+                        lowNetwork: false
+
+                    },
+
+                    notifications: []
+
+                };
+
+            }
+
+
+
+            loadState() {
+
+                const stored = localStorage.getItem('gramsetu_state');
+
+                return stored ? JSON.parse(stored) : this.getInitialState();
+
+            }
+
+
+
+            saveState() {
+
+                localStorage.setItem('gramsetu_state', JSON.stringify(this.state));
+
+                this.notifySubscribers();
+
+            }
+
+
+
+            update(path, value) {
+
+                // Simple dot notation update logic (simplified for single-file)
+
+                if (path === 'user') this.state.user = value;
+
+                if (path === 'settings.language') this.state.settings.language = value;
+
+                if (path === 'settings.simpleMode') this.state.settings.simpleMode = value;
+
+                if (path === 'settings.lowNetwork') this.state.settings.lowNetwork = value;
+
+                this.saveState();
+
+            }
+
+
+
+            connectDigiLocker() {
+
+                this.state.digiLocker.connected = true;
+
+                this.state.digiLocker.aadhaarVerified = true;
+
+                this.state.digiLocker.incomeVerified = true;
+
+                // Simulate documents
+
+                this.state.digiLocker.documents = [
+
+                    { name: "Aadhaar Card", type: "ID", date: "2024-01-15", verified: true },
+
+                    { name: "Income Certificate", type: "Income", date: "2025-10-10", verified: true },
+
+                    { name: "Kisan Card", type: "Occupation", date: "2023-05-20", verified: true }
+
+                ];
+
+                if(this.state.digiLocker.documents.some(d => d.type === "Occupation")) {
+
+                    this.state.digiLocker.farmerVerified = true;
+
+                }
+
+                this.saveState();
+
+            }
+
+
+
+            subscribe(schemeId) {
+
+                if (!this.state.subscriptions.includes(schemeId)) {
+
+                    this.state.subscriptions.push(schemeId);
+
+                    this.addNotification(`Subscribed to ${SCHEMES_DB.find(s=>s.id===schemeId).name}`);
+
+                    this.saveState();
+
+                }
+
+            }
+
+
+
+            apply(schemeId) {
+
+                const scheme = SCHEMES_DB.find(s => s.id === schemeId);
+
+                const appId = `GS-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+                this.state.applications.push({
+
+                    schemeId: schemeId,
+
+                    schemeName: scheme.name,
+
+                    appId: appId,
+
+                    status: 'Submitted',
+
+                    date: new Date().toISOString(),
+
+                    progress: 1 // 1: Submitted, 2: Review, 3: Approved
+
+                });
+
+                this.addNotification(`Application Submitted for ${scheme.name}. ID: ${appId}`);
+
+                this.saveState();
+
+            }
+
+
+
+            addNotification(msg) {
+
+                this.state.notifications.unshift({ msg, date: new Date().toISOString(), read: false });
+
+                this.saveState();
+
+            }
+
+
+
+            // Simple Observer Pattern
+
+            subscribers = [];
+
+            subscribeToUpdates(callback) {
+
+                this.subscribers.push(callback);
+
+            }
+
+            notifySubscribers() {
+
+                this.subscribers.forEach(cb => cb(this.state));
+
+            }
+
+        }
+
+
+
+        const store = new Store();
+
+
+
+        // ==========================================
+
+        // 3. LOGIC ENGINES
+
+        // ==========================================
+
+
+
+        const LogicEngine = {
+
+            calculateEligibility: (user, scheme) => {
+
+                if (!user) return false;
+
+                
+
+                // Income Check
+
+                if (scheme.eligibility.maxIncome && user.income > scheme.eligibility.maxIncome) return false;
+
+                
+
+                // Occupation Check
+
+                if (scheme.eligibility.occupation !== 'Any' && user.occupation !== scheme.eligibility.occupation) return false;
+
+                
+
+                // Age Check
+
+                if (scheme.eligibility.ageMin && user.age < scheme.eligibility.ageMin) return false;
+
+                if (scheme.eligibility.ageMax && user.age > scheme.eligibility.ageMax) return false;
+
+
+
+                return true;
+
+            },
+
+
+
+            getSchemeReadiness: (schemeId) => {
+
+                const dl = store.state.digiLocker;
+
+                const scheme = SCHEMES_DB.find(s => s.id === schemeId);
+
+                
+
+                let verifiedCount = 0;
+
+                let totalReq = scheme.docsRequired.length;
+
+                
+
+                if (dl.aadhaarVerified && scheme.docsRequired.includes('Aadhaar')) verifiedCount++;
+
+                if (dl.incomeVerified && scheme.docsRequired.includes('Income Certificate')) verifiedCount++;
+
+                if (dl.farmerVerified && scheme.docsRequired.includes('Land Record')) verifiedCount++;
+
+
+
+                if (!dl.connected) return { status: 'Connect DigiLocker', color: 'text-gray-500', icon: 'fa-lock' };
+
+                if (verifiedCount === totalReq) return { status: 'Ready to Apply', color: 'text-green-600', icon: 'fa-check-circle' };
+
+                if (verifiedCount > 0) return { status: 'Docs Missing', color: 'text-orange-500', icon: 'fa-exclamation-circle' };
+
+                return { status: 'Not Eligible', color: 'text-red-500', icon: 'fa-times-circle' };
+
+            },
+
+
+
+            calculateCountdown: (dateString) => {
+
+                const deadline = new Date(dateString);
+
+                const now = new Date();
+
+                const diffTime = Math.abs(deadline - now);
+
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                return diffDays;
+
+            },
+
+
+
+            getRecommendations: (user) => {
+
+                if (!user) return [];
+
+                return SCHEMES_DB.map(scheme => {
+
+                    let score = 0;
+
+                    if (scheme.eligibility.occupation === user.occupation) score += 50;
+
+                    if (user.income < (scheme.eligibility.maxIncome || 99999999) / 2) score += 30;
+
+                    if (store.state.digiLocker.farmerVerified && scheme.category === 'Farmer') score += 20;
+
+                    
+
+                    scheme.matchScore = score;
+
+                    return scheme;
+
+                }).sort((a, b) => b.matchScore - a.matchScore);
+
+            }
+
+        };
+
+
+
+        // ==========================================
+
+        // 4. ROUTER & VIEW RENDERING
+
+        // ==========================================
+
+
+
+        const Router = {
+
+            currentRoute: 'home',
+
+            
+
+            navigate: (route) => {
+
+                Router.currentRoute = route;
+
+                window.scrollTo(0, 0);
+
+                Router.render();
+
+            },
+
+
+
+            render: () => {
+
+                const appDiv = document.getElementById('app');
+
+                appDiv.innerHTML = '';
+
+                
+
+                // Update Nav States
+
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+                
+
+                switch (Router.currentRoute) {
+
+                    case 'home':
+
+                        appDiv.innerHTML = Views.home();
+
+                        break;
+
+                    case 'schemes':
+
+                        appDiv.innerHTML = Views.schemeList();
+
+                        setTimeout(() => app.runEligibilityCheck(), 100); // Run logic after render
+
+                        break;
+
+                    case 'dashboard':
+
+                        appDiv.innerHTML = Views.dashboard();
+
+                        break;
+
+                    case 'digilocker':
+
+                        appDiv.innerHTML = Views.digilocker();
+
+                        break;
+
+                    case 'guide':
+
+                        appDiv.innerHTML = Views.guide();
+
+                        break;
+
+                    default:
+
+                        appDiv.innerHTML = Views.home();
+
+                }
+
+                
+
+                app.updateUIStrings();
+
+            }
+
+        };
+
+
+
+        const Views = {
+
+            home: () => `
+
+                <div class="flex flex-col gap-10 fade-in">
+
+                    <section class="bg-gov-primary rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-lg">
+
+                        <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+
+                        <h1 class="text-3xl md:text-5xl font-bold mb-4" data-translate="welcome">Welcome to GramSetu</h1>
+
+                        <p class="text-lg md:text-xl text-gov-soft mb-8 max-w-2xl mx-auto" data-translate="subtitle">Connecting Every Village to Government Benefits. Simple, Fast, and Secure.</p>
+
+                        
+
+                        <div class="flex flex-col md:flex-row gap-4 justify-center relative z-10">
+
+                            ${!store.state.user ? `
+
+                                <button onclick="app.scrollToId('eligibility-form')" class="bg-white text-gov-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-gov-light shadow-lg transition transform hover:scale-105">
+
+                                    <i class="fas fa-search mr-2"></i> Find My Schemes
+
+                                </button>
+
+                            ` : `
+
+                                <button onclick="router.navigate('dashboard')" class="bg-white text-gov-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-gov-light shadow-lg transition">
+
+                                    <i class="fas fa-user mr-2"></i> Go to Dashboard
+
+                                </button>
+
+                            `}
+
+                            ${!store.state.digiLocker.connected ? `
+
+                            <button onclick="router.navigate('digilocker')" class="bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-700 shadow-lg transition transform hover:scale-105">
+
+                                <i class="fas fa-cloud mr-2"></i> Connect DigiLocker
+
+                            </button>` : ''}
+
+                        </div>
+
+                    </section>
+
+
+
+                    ${!store.state.user ? `
+
+                    <section id="eligibility-form" class="bg-white p-6 md:p-10 rounded-2xl shadow-md border-t-4 border-gov-accent max-w-4xl mx-auto w-full">
+
+                        <h2 class="text-2xl font-bold text-gov-primary mb-6 flex items-center gap-2">
+
+                            <i class="fas fa-clipboard-check"></i> Check Your Eligibility
+
+                        </h2>
+
+                        <form onsubmit="app.handleProfileSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            <div>
+
+                                <label class="block text-gray-700 font-bold mb-2">Full Name</label>
+
+                                <input type="text" name="name" required class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary focus:ring-1 focus:ring-gov-primary bg-gov-bg" placeholder="e.g. Ram Kumar">
+
+                            </div>
+
+                            <div>
+
+                                <label class="block text-gray-700 font-bold mb-2">Age</label>
+
+                                <input type="number" name="age" required class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg" placeholder="e.g. 45">
+
+                            </div>
+
+                            <div>
+
+                                <label class="block text-gray-700 font-bold mb-2">Occupation</label>
+
+                                <select name="occupation" class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg">
+
+                                    <option value="Farmer">Farmer (Kisan)</option>
+
+                                    <option value="Laborer">Laborer</option>
+
+                                    <option value="Artisan">Artisan</option>
+
+                                    <option value="Student">Student</option>
+
+                                    <option value="Unemployed">Unemployed</option>
+
+                                </select>
+
+                            </div>
+
+                            <div>
+
+                                <label class="block text-gray-700 font-bold mb-2">Annual Family Income (₹)</label>
+
+                                <input type="number" name="income" required class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg" placeholder="e.g. 150000">
+
+                            </div>
+
+                            <div class="md:col-span-2">
+
+                                <label class="block text-gray-700 font-bold mb-2">State</label>
+
+                                <select name="state" class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg">
+
+                                    <option value="UP">Uttar Pradesh</option>
+
+                                    <option value="MP">Madhya Pradesh</option>
+
+                                    <option value="BH">Bihar</option>
+
+                                    <option value="RJ">Rajasthan</option>
+
+                                    <option value="MH">Maharashtra</option>
+
+                                    <option value="KA">Karnataka</option>
+
+                                    </select>
+
+                            </div>
+
+                            <div class="md:col-span-2 mt-4">
+
+                                <button type="submit" class="w-full bg-gov-primary text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-800 transition text-lg">
+
+                                    Check Eligible Schemes
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </section>
+
+                    ` : ''}
+
+
+
+                    <section class="mb-10">
+
+                        <h3 class="text-xl font-bold text-gray-700 mb-4 flex items-center gap-2"><i class="fas fa-map-marker-alt text-red-500"></i> Nearby Service Centers (CSC)</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                            ${CSC_CENTERS.map(c => `
+
+                                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
+
+                                    <div>
+
+                                        <h4 class="font-bold text-gov-primary">${c.name}</h4>
+
+                                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">${c.status}</span>
+
+                                    </div>
+
+                                    <div class="text-right">
+
+                                        <div class="text-lg font-bold text-gray-600">${c.dist}</div>
+
+                                        <button class="text-xs text-blue-600 font-bold underline">Map</button>
+
+                                    </div>
+
+                                </div>
+
+                            `).join('')}
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            `,
+
+
+
+            schemeList: () => `
+
+                <div class="flex flex-col gap-6">
+
+                    <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+
+                        <h2 class="text-2xl font-bold text-gov-primary">Government Schemes</h2>
+
+                        <div class="flex gap-2">
+
+                             <button onclick="app.setFilter('all')" class="px-4 py-2 bg-gov-light text-gov-primary rounded-lg font-medium hover:bg-gov-soft focus:ring-2">All</button>
+
+                             ${store.state.user ? `<button onclick="app.setFilter('eligible')" class="px-4 py-2 bg-gov-primary text-white rounded-lg font-medium shadow focus:ring-2">Recommended</button>` : ''}
+
+                        </div>
+
+                    </div>
+
+                    
+
+                    <div id="schemes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                        <div class="col-span-full text-center py-10"><div class="loader mx-auto"></div> Loading Schemes...</div>
+
+                    </div>
+
+                </div>
+
+            `,
+
+
+
+            dashboard: () => {
+
+                if(!store.state.user) return `<div class="text-center py-20"><h2 class="text-2xl font-bold text-gray-600">Please complete your profile first.</h2><button onclick="router.navigate('home')" class="mt-4 text-gov-primary underline">Go Home</button></div>`;
+
+
+
+                return `
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+                    <div class="lg:col-span-1">
+
+                        <div class="bg-white rounded-2xl shadow p-6 border-t-4 border-gov-primary">
+
+                            <div class="flex flex-col items-center text-center">
+
+                                <div class="w-20 h-20 bg-gov-light rounded-full flex items-center justify-center text-3xl text-gov-primary mb-4">
+
+                                    <i class="fas fa-user"></i>
+
+                                </div>
+
+                                <h3 class="text-xl font-bold">${store.state.user.name}</h3>
+
+                                <p class="text-gray-500">${store.state.user.occupation}</p>
+
+                                <div class="w-full mt-6 border-t pt-4">
+
+                                    <div class="flex justify-between py-2 border-b">
+
+                                        <span class="text-gray-500">Age</span>
+
+                                        <span class="font-bold">${store.state.user.age}</span>
+
+                                    </div>
+
+                                    <div class="flex justify-between py-2 border-b">
+
+                                        <span class="text-gray-500">Income</span>
+
+                                        <span class="font-bold">₹${store.state.user.income}</span>
+
+                                    </div>
+
+                                    <div class="flex justify-between py-2">
+
+                                        <span class="text-gray-500">State</span>
+
+                                        <span class="font-bold">${store.state.user.state}</span>
+
+                                    </div>
+
+                                </div>
+
+                                <button onclick="app.logout()" class="mt-6 w-full py-2 text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Log Out</button>
+
+                            </div>
+
+                        </div>
+
+                        
+
+                        <div class="bg-white rounded-2xl shadow p-6 mt-6">
+
+                            <h4 class="font-bold text-gray-700 mb-4">Notifications</h4>
+
+                            <div class="flex flex-col gap-3 max-h-60 overflow-y-auto no-scrollbar">
+
+                                ${store.state.notifications.length === 0 ? '<p class="text-sm text-gray-400">No new alerts.</p>' : 
+
+                                  store.state.notifications.map(n => `
+
+                                    <div class="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+
+                                        <p class="text-sm text-gray-800">${n.msg}</p>
+
+                                        <span class="text-xs text-gray-500">${new Date(n.date).toLocaleDateString()}</span>
+
+                                    </div>
+
+                                  `).join('')}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="lg:col-span-3 flex flex-col gap-6">
+
+                        
+
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+
+                            <div class="flex items-center gap-4">
+
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Digital_India_logo.svg/1200px-Digital_India_logo.svg.png" class="h-12 w-auto object-contain">
+
+                                <div>
+
+                                    <h3 class="font-bold text-lg">DigiLocker Integration</h3>
+
+                                    <p class="text-sm text-gray-500">${store.state.digiLocker.connected ? 'Documents Verified & Synced' : 'Connect to auto-verify eligibility'}</p>
+
+                                </div>
+
+                            </div>
+
+                            ${store.state.digiLocker.connected 
+
+                                ? `<span class="bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold flex items-center gap-2"><i class="fas fa-check-circle"></i> Connected</span>`
+
+                                : `<button onclick="router.navigate('digilocker')" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700">Connect Now</button>`
+
+                            }
+
+                        </div>
+
+
+
+                        <div>
+
+                            <h3 class="text-xl font-bold text-gov-primary mb-4">My Applications</h3>
+
+                            ${store.state.applications.length === 0 ? 
+
+                                `<div class="text-center p-8 bg-white rounded-xl border border-dashed border-gray-300">
+
+                                    <p class="text-gray-500 mb-2">You haven't applied to any schemes yet.</p>
+
+                                    <button onclick="router.navigate('schemes')" class="text-gov-primary font-bold underline">Find Schemes</button>
+
+                                 </div>` 
+
+                                : 
+
+                                `<div class="grid gap-4">
+
+                                    ${store.state.applications.map(app => `
+
+                                        <div class="bg-white p-5 rounded-xl shadow-sm border border-l-4 border-l-yellow-500 flex flex-col md:flex-row justify-between items-center">
+
+                                            <div>
+
+                                                <h4 class="font-bold text-lg">${app.schemeName}</h4>
+
+                                                <p class="text-xs text-gray-500 font-mono">ID: ${app.appId}</p>
+
+                                            </div>
+
+                                            <div class="flex items-center gap-6 mt-4 md:mt-0">
+
+                                                <div class="flex flex-col items-end">
+
+                                                    <span class="text-sm font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full">${app.status}</span>
+
+                                                    <span class="text-xs text-gray-400 mt-1">Updated: Just now</span>
+
+                                                </div>
+
+                                                <button class="text-gray-400 hover:text-gov-primary"><i class="fas fa-chevron-right"></i></button>
+
+                                            </div>
+
+                                        </div>
+
+                                    `).join('')}
+
+                                </div>`
+
+                            }
+
+                        </div>
+
+
+
+                        <div>
+
+                            <h3 class="text-xl font-bold text-gov-primary mb-4">Subscribed / Saved Schemes</h3>
+
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                ${store.state.subscriptions.length === 0 ? 
+
+                                    '<p class="text-gray-500 italic">No subscriptions yet.</p>' :
+
+                                    store.state.subscriptions.map(id => {
+
+                                        const s = SCHEMES_DB.find(x => x.id === id);
+
+                                        const deadline = LogicEngine.calculateCountdown(s.deadline);
+
+                                        return `
+
+                                        <div class="bg-white p-4 rounded-xl border shadow-sm relative overflow-hidden">
+
+                                            <div class="absolute top-0 right-0 bg-gov-light p-2 rounded-bl-xl text-gov-primary">
+
+                                                <i class="fas fa-bookmark"></i>
+
+                                            </div>
+
+                                            <h4 class="font-bold text-gray-800 pr-8">${s.name}</h4>
+
+                                            <p class="text-xs text-red-500 font-bold mt-2"><i class="far fa-clock"></i> ${deadline} days left</p>
+
+                                            <div class="mt-4 flex gap-2">
+
+                                                <button onclick="app.initApply('${s.id}')" class="flex-1 bg-gov-primary text-white text-sm py-2 rounded hover:bg-green-800">Apply Now</button>
+
+                                                <button class="px-3 border border-gray-300 rounded hover:bg-gray-50"><i class="fas fa-info"></i></button>
+
+                                            </div>
+
+                                        </div>
+
+                                        `
+
+                                    }).join('')
+
+                                }
+
+                             </div>
+
+                        </div>
+
+
+
+                        ${store.state.digiLocker.connected ? `
+
+                        <div>
+
+                            <h3 class="text-xl font-bold text-gov-primary mb-4">My Verified Documents</h3>
+
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                                ${store.state.digiLocker.documents.map(doc => `
+
+                                    <div class="bg-white p-4 rounded-lg border border-gray-200 text-center">
+
+                                        <i class="fas fa-file-alt text-3xl text-gray-400 mb-2"></i>
+
+                                        <p class="text-sm font-bold truncate">${doc.name}</p>
+
+                                        <span class="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded">Verified <i class="fas fa-check"></i></span>
+
+                                    </div>
+
+                                `).join('')}
+
+                            </div>
+
+                        </div>` : ''}
+
+
+
+                    </div>
+
+                </div>
+
+                `;
+
+            },
+
+
+
+            digilocker: () => `
+
+                <div class="max-w-2xl mx-auto text-center py-10 bg-white rounded-2xl shadow-xl p-8">
+
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Digital_India_logo.svg/1200px-Digital_India_logo.svg.png" class="h-20 mx-auto mb-6">
+
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Secure Authentication</h2>
+
+                    <p class="text-gray-600 mb-8">Link your Aadhaar to fetch official government documents instantly. This helps in auto-verifying your eligibility for schemes.</p>
+
+                    
+
+                    ${store.state.digiLocker.connected ? `
+
+                        <div class="bg-green-50 border border-green-200 p-6 rounded-xl mb-6">
+
+                            <div class="text-5xl text-green-500 mb-4"><i class="fas fa-check-circle"></i></div>
+
+                            <h3 class="text-xl font-bold text-green-800">DigiLocker Connected Successfully</h3>
+
+                            <p class="text-sm text-green-600 mt-2">Your documents are now synced.</p>
+
+                        </div>
+
+                        <button onclick="router.navigate('dashboard')" class="bg-gov-primary text-white px-8 py-3 rounded-lg font-bold shadow-lg">Go to Dashboard</button>
+
+                    ` : `
+
+                        <div id="dl-actions">
+
+                            <button onclick="app.processDigiLocker()" class="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-lg hover:bg-blue-700 w-full md:w-auto flex items-center justify-center gap-3 mx-auto">
+
+                                <span id="dl-btn-text">Connect DigiLocker</span>
+
+                                <div id="dl-spinner" class="loader hidden w-6 h-6 border-white border-t-blue-600"></div>
+
+                            </button>
+
+                            <p class="mt-4 text-xs text-gray-400">By connecting, you agree to share your Aadhaar data for verification purposes only.</p>
+
+                        </div>
+
+                    `}
+
+                </div>
+
+            `,
+
+
+
+            guide: () => `
+
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow">
+
+                    <h2 class="text-2xl font-bold text-gov-primary mb-6" data-translate="nav_guide">How to Apply</h2>
+
+                    <div class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+
+                            <div data-no-translate class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-gov-primary text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">1</div>
+
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-200 shadow break-words overflow-hidden">
+
+                                <div class="flex items-center justify-between space-x-2 mb-1">
+
+                                    <div class="font-bold text-slate-900 break-words" data-translate="step_1">Check Eligibility</div>
+
+                                </div>
+
+                                <div class="text-slate-500 break-words leading-relaxed" data-translate="guide_desc_1">Fill your profile details to find relevant schemes.</div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+
+                            <div data-no-translate class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-gov-primary text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">2</div>
+
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-200 shadow break-words overflow-hidden">
+
+                                <div class="flex items-center justify-between space-x-2 mb-1">
+
+                                    <div class="font-bold text-slate-900 break-words" data-translate="step_2">Connect DigiLocker</div>
+
+                                </div>
+
+                                <div class="text-slate-500 break-words leading-relaxed" data-translate="guide_desc_2">Verify documents instantly without paperwork.</div>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+
+                            <div data-no-translate class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-gov-primary text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">3</div>
+
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-200 shadow break-words overflow-hidden">
+
+                                <div class="flex items-center justify-between space-x-2 mb-1">
+
+                                   <div class="font-bold text-slate-900 break-words" data-translate="step_3">Apply & Track</div>
+
+                                </div>
+
+                                <div class="text-slate-500 break-words leading-relaxed" data-translate="guide_desc_3">Submit application and track status on dashboard.</div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `
+
+        };
+
+
+
+        // ==========================================
+
+        // 5. MAIN CONTROLLER
+
+        // ==========================================
+
+
+
+        const app = {
+
+            init: () => {
+
+                store.subscribeToUpdates(app.onStateChange);
+
+                Router.render();
+
+                
+
+                // Initialize Settings
+
+                if (store.state.settings.simpleMode) document.body.classList.add('simple-mode');
+
+                if (store.state.settings.lowNetwork) document.body.classList.add('low-network');
+
+                document.getElementById('languageSelector').value = store.state.settings.language;
+
+            },
+
+
+
+            onStateChange: (state) => {
+
+                // Update specific DOM elements that might be visible
+
+                if (document.getElementById('authSection')) {
+
+                    // Update header auth state
+
+                }
+
+            },
+
+
+
+            handleProfileSubmit: (e) => {
+
+                e.preventDefault();
+
+                const fd = new FormData(e.target);
+
+                const user = {
+
+                    name: fd.get('name'),
+
+                    age: parseInt(fd.get('age')),
+
+                    occupation: fd.get('occupation'),
+
+                    income: parseInt(fd.get('income')),
+
+                    state: fd.get('state')
+
+                };
+
+                
+
+                // Simulate loading
+
+                const btn = e.target.querySelector('button');
+
+                const originalText = btn.innerText;
+
+                btn.innerText = 'Analyzing Profile...';
+
+                btn.disabled = true;
+
+
+
+                setTimeout(() => {
+
+                    store.update('user', user);
+
+                    app.toast("Eligibility Profile Created Successfully!");
+
+                    router.navigate('schemes');
+
+                }, 1500);
+
+            },
+
+
+
+            runEligibilityCheck: () => {
+
+                const container = document.getElementById('schemes-grid');
+
+                if (!container) return;
+
+
+
+                const user = store.state.user;
+
+                if (!user && Router.currentRoute === 'schemes') {
+
+                    // Show all public schemes with a note
+
+                    container.innerHTML = app.renderSchemeCards(SCHEMES_DB);
+
+                    return;
+
+                }
+
+
+
+                // Smart Recommendation Engine Logic
+
+                const recommended = LogicEngine.getRecommendations(user);
+
+                // Filter out non-eligible ones strictly? Or just rank them? 
+
+                // Let's filter strictly eligible ones for "Smart" view
+
+                const eligible = recommended.filter(s => LogicEngine.calculateEligibility(user, s));
+
+                
+
+                if (eligible.length === 0) {
+
+                    container.innerHTML = `<div class="col-span-full text-center p-10">No specific schemes found for your profile. Try changing filters to 'All'.</div>`;
+
+                } else {
+
+                    container.innerHTML = app.renderSchemeCards(eligible);
+
+                }
+
+            },
+
+
+
+            setFilter: (type) => {
+
+                const container = document.getElementById('schemes-grid');
+
+                container.innerHTML = '<div class="col-span-full text-center py-10"><div class="loader mx-auto"></div></div>';
+
+                
+
+                setTimeout(() => {
+
+                    if (type === 'all') {
+
+                        container.innerHTML = app.renderSchemeCards(SCHEMES_DB);
+
+                    } else if (type === 'eligible') {
+
+                        app.runEligibilityCheck();
+
+                    }
+
+                }, 500);
+
+            },
+
+
+
+            renderSchemeCards: (schemes) => {
+
+                return schemes.map(s => {
+
+                    const daysLeft = LogicEngine.calculateCountdown(s.deadline);
+
+                    const readiness = LogicEngine.getSchemeReadiness(s.id);
+
+                    const isSubscribed = store.state.subscriptions.includes(s.id);
+
+                    
+
+                    return `
+
+                    <div class="card p-5 flex flex-col h-full relative">
+
+                        ${s.trustLevel ? `<span class="absolute top-4 right-4 text-[10px] uppercase font-bold text-gray-400 border border-gray-200 px-2 py-0.5 rounded">${s.trustLevel}</span>` : ''}
+
+                        
+
+                        <div class="mb-4">
+
+                             <span class="bg-gov-light text-gov-primary text-xs font-bold px-2 py-1 rounded-md mb-2 inline-block">${s.category}</span>
+
+                             <h3 class="text-xl font-bold text-gray-800 leading-tight">${s.name}</h3>
+
+                        </div>
+
+                        
+
+                        <p class="text-gray-600 text-sm mb-4 flex-grow">${s.description}</p>
+
+                        
+
+                        <div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm">
+
+                            <p class="font-bold text-gray-700">Benefits:</p>
+
+                            <ul class="list-disc ml-4 text-gray-600 text-xs">
+
+                                ${s.benefits.slice(0, 2).map(b => `<li>${b}</li>`).join('')}
+
+                            </ul>
+
+                        </div>
+
+
+
+                        <div class="flex justify-between items-center text-xs font-bold mb-4">
+
+                            <span class="text-red-500"><i class="far fa-clock"></i> ${daysLeft} days left</span>
+
+                            <span class="${readiness.color}"><i class="fas ${readiness.icon}"></i> ${readiness.status}</span>
+
+                        </div>
+
+
+
+                        <div class="flex gap-3 mt-auto">
+
+                            <button onclick="app.toggleSubscribe('${s.id}')" class="flex-1 py-2 border border-gov-primary text-gov-primary rounded hover:bg-gov-light transition">
+
+                                ${isSubscribed ? '<i class="fas fa-check"></i> Saved' : 'Save'}
+
+                            </button>
+
+                            <button onclick="app.initApply('${s.id}')" class="flex-[2] py-2 bg-gov-primary text-white rounded hover:bg-green-800 shadow-md transition font-bold">
+
+                                Apply Now
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    `;
+
+                }).join('');
+
+            },
+
+
+
+            processDigiLocker: () => {
+
+                const btnText = document.getElementById('dl-btn-text');
+
+                const spinner = document.getElementById('dl-spinner');
+
+                
+
+                btnText.innerText = 'Authenticating...';
+
+                spinner.classList.remove('hidden');
+
+                
+
+                setTimeout(() => {
+
+                    btnText.innerText = 'Fetching Docs...';
+
+                    setTimeout(() => {
+
+                        store.connectDigiLocker();
+
+                        Router.render(); // Re-render to show success state
+
+                        app.toast("DigiLocker Connected! Documents Fetched.");
+
+                    }, 1500);
+
+                }, 1500);
+
+            },
+
+
+
+            initApply: (schemeId) => {
+
+                if (!store.state.user) {
+
+                    app.toast("Please complete profile first", "error");
+
+                    app.scrollToId('eligibility-form');
+
+                    return;
+
+                }
+
+                
+
+                if (!store.state.digiLocker.connected) {
+
+                    if(confirm("DigiLocker not connected. This will speed up your application. Connect now?")) {
+
+                        router.navigate('digilocker');
+
+                        return;
+
+                    }
+
+                }
+
+
+
+                // Check if already applied
+
+                if (store.state.applications.some(a => a.schemeId === schemeId)) {
+
+                    app.toast("You have already applied for this scheme.", "warning");
+
+                    return;
+
+                }
+
+
+
+                // Simulate Application Process
+
+                const confirmApply = confirm(`Apply for ${SCHEMES_DB.find(s=>s.id===schemeId).name}?`);
+
+                if (confirmApply) {
+
+                    store.apply(schemeId);
+
+                    app.toast("Application Submitted Successfully!");
+
+                    router.navigate('dashboard');
+
+                }
+
+            },
+
+
+
+            toggleSubscribe: (schemeId) => {
+
+                if (store.state.subscriptions.includes(schemeId)) {
+
+                    // Unsubscribe logic could be added here
+
+                    app.toast("Already subscribed.");
+
+                } else {
+
+                    store.subscribe(schemeId);
+
+                    app.toast("Scheme Saved to Dashboard");
+
+                    Router.render(); // Update UI button state
+
+                }
+
+            },
+
+
+
+            toggleSimpleMode: () => {
+
+                const newVal = !store.state.settings.simpleMode;
+
+                store.update('settings.simpleMode', newVal);
+
+                document.body.classList.toggle('simple-mode', newVal);
+
+                app.toast(`Simple Mode ${newVal ? 'ON' : 'OFF'}`);
+
+            },
+
+
+
+            toggleLowNetwork: () => {
+
+                const newVal = !store.state.settings.lowNetwork;
+
+                store.update('settings.lowNetwork', newVal);
+
+                document.body.classList.toggle('low-network', newVal);
+
+                app.toast(`Low Network Mode ${newVal ? 'ON' : 'OFF'}`);
+
+            },
+
+
+
+            setLanguage: (lang) => {
+
+                store.update('settings.language', lang);
+
+                app.updateUIStrings();
+
+                app.toast("Language Updated");
+
+            },
+
+
+
+            updateUIStrings: () => {
+
+                const lang = store.state.settings.language;
+
+                const dict = TRANSLATIONS[lang] || TRANSLATIONS['en'];
+
+                
+
+                document.querySelectorAll('[data-translate]').forEach(el => {
+
+                    const key = el.getAttribute('data-translate');
+
+                    if (dict[key]) el.innerText = dict[key];
+
+                });
+
+            },
+
+
+
+            toast: (msg, type = 'success') => {
+
+                const container = document.getElementById('toast-container');
+
+                const div = document.createElement('div');
+
+                const colorClass = type === 'error' ? 'bg-red-500' : (type === 'warning' ? 'bg-yellow-500' : 'bg-gov-primary');
+
+                div.className = `${colorClass} text-white px-6 py-3 rounded-lg shadow-lg text-sm font-bold flex items-center gap-2 transform transition-all duration-300 translate-x-10 opacity-0`;
+
+                div.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
+
+                container.appendChild(div);
+
+                
+
+                // Animate In
+
+                requestAnimationFrame(() => {
+
+                    div.classList.remove('translate-x-10', 'opacity-0');
+
+                });
+
+
+
+                // Remove after 3s
+
+                setTimeout(() => {
+
+                    div.classList.add('opacity-0', 'translate-y-2');
+
+                    setTimeout(() => div.remove(), 300);
+
+                }, 3000);
+
+            },
+
+            
+
+            toggleMobileMenu: () => {
+
+                const menu = document.getElementById('mobileMenu');
+
+                menu.classList.toggle('hidden');
+
+            },
+
+
+
+            logout: () => {
+
+                localStorage.removeItem('gramsetu_state');
+
+                window.location.reload();
+
+            },
+
+
+
+            scrollToId: (id) => {
+
+                document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+
+            },
+
+
+
+            activateVoiceAssistant: () => {
+
+                app.toast("Listening... (Speak now)");
+
+                // Simulation of voice recognition
+
+                setTimeout(() => {
+
+                    app.toast("Voice not recognized (Demo Mode)", "warning");
+
+                }, 3000);
+
+            }
+
+        };
+
+
+
+        // Expose router to window for HTML onclicks
+
+        window.router = Router;
+
+        window.app = app;
+
+
+
+        // Initialize App
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            app.init();
+
+        });
+
+
+
+        // ==========================================
+
+        // EXPANSION JAVASCRIPT LOGIC (APPENDED)
+
+        // ==========================================
+
+
+
+        /**
+
+         * GRAMSETU EXPANSION ENGINE
+
+         * * This script overrides and extends the functionality of the base prototype.
+
+         * It uses the 'Expander' namespace to avoid collisions but monkey-patches
+
+         * the original 'app' and 'Views' objects to inject new features.
+
+         */
+
+
+
+        const DICTIONARY = {
+
+            // ==========================================
+
+            // COMPLETE TRANSLATION MATRIX (9 Languages)
+
+            // ==========================================
+
+            
+
+            // --- HINDI (hi) ---
+
+            hi: {
+
+                guide_desc_1: "अपनी प्रोफ़ाइल भरें और योजनाएं खोजें",
+
+                guide_desc_2: "बिना कागज़ के दस्तावेज़ सत्यापित करें",
+
+                guide_desc_3: "आवेदन करें और स्थिति ट्रैक करें",
+
+                welcome: "ग्रामसेतु में आपका स्वागत है",
+
+                subtitle: "सरकारी लाभ को हर गाँव तक पहुँचाना। सरल, तेज़ और सुरक्षित।",
+
+                nav_home: "होम",
+
+                nav_schemes: "योजनाएं",
+
+                nav_dashboard: "प्रोफ़ाइल",
+
+                nav_guide: "सहायता",
+
+                hdr_notifications: "सूचनाएं",
+
+                lbl_realtime: "रीयल-टाइम अलर्ट सक्रिय",
+
+                btn_clear_all: "सभी साफ़ करें",
+
+                lbl_phone: "मोबाइल नंबर",
+
+                ph_phone: "उदा. 9876543210",
+
+                btn_get_otp: "ओटीपी प्राप्त करें",
+
+                msg_otp_sent: "आपके मोबाइल पर ओटीपी भेजा गया है",
+
+                lbl_verify_otp: "ओटीपी सत्यापित करें",
+
+                btn_verify: "सत्यापित करें",
+
+                sec_recommended: "आपके लिए अनुशंसित योजनाएं",
+
+                sec_documents: "दस्तावेज़ स्थिति",
+
+                sec_tracker: "आवेदन ट्रैक करें",
+
+                lbl_eligible: "पात्रता",
+
+                lbl_deadline: "अंतिम तिथि",
+
+                lbl_benefits: "लाभ",
+
+                btn_apply: "अभी आवेदन करें",
+
+                btn_save: "सहेजें",
+
+                btn_saved: "सहेजा गया",
+
+                status_submitted: "जमा किया",
+
+                status_review: "समीक्षाधीन",
+
+                status_approved: "स्वीकृत",
+
+                status_rejected: "अस्वीकृत",
+
+                msg_sub_success: "सफलतापूर्वक सदस्यता ली गई",
+
+                msg_doc_fetch: "दस्तावेज़ प्राप्त कर रहे हैं...",
+
+                msg_welcome_sms: "ग्रामसेतु में आपका स्वागत है! योजनाओं के अपडेट के लिए यह आपका पंजीकृत नंबर है।",
+
+                lbl_days_left: "दिन शेष",
+
+                lbl_verified: "सत्यापित",
+
+                lbl_missing: "लापता",
+
+                lbl_connect_dl: "डिजिलॉकर कनेक्ट करें",
+
+                desc_pm_kisan: "भूमिधारक किसान परिवारों को प्रति वर्ष ₹6,000 की वित्तीय सहायता।",
+
+                desc_ayushman: "प्रति परिवार प्रति वर्ष ₹5 लाख तक का स्वास्थ्य बीमा कवरेज।",
+
+                desc_soil: "उपज में सुधार के लिए अपनी मिट्टी की पोषक स्थिति के बारे में जानकारी प्राप्त करें।",
+
+                desc_atal: "असंगठित क्षेत्र के नागरिकों के लिए पेंशन योजना।",
+
+                desc_awas: "बेघर लोगों के लिए पक्का घर बनाने के लिए वित्तीय सहायता।",
+
+                desc_kcc: "कृषि आवश्यकताओं के लिए किसानों को समय पर ऋण।",
+
+                step_1: "पात्रता जाँचें",
+
+                step_2: "कनेक्ट करें",
+
+                step_3: "आवेदन करें",
+
+                msg_profile_update: "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+
+                msg_app_submitted: "आवेदन सफलतापूर्वक जमा किया गया! आईडी: ",
+
+                hdr_csc: "नज़दीकी सेवा केंद्र",
+
+                lbl_distance: "दूरी",
+
+                lbl_open: "खुला है",
+
+                lbl_busy: "व्यस्त",
+
+                btn_view_map: "मैप देखें",
+
+                check_eligibility: "पात्रता जाँचें",
+
+                btn_find: "मेरी योजनाएं खोजें",
+
+                lbl_state: "राज्य",
+
+                lbl_inc: "वार्षिक आय",
+
+                lbl_occ: "व्यवसाय",
+
+                lbl_age: "आयु",
+
+                lbl_name: "पूरा नाम"
+
+            },
+
+
+
+            // --- BENGALI (bn) ---
+
+            bn: {
+
+                welcome: "গ্রামসেতুতে আপনাকে স্বাগতম",
+
+                subtitle: "প্রতিটি গ্রামকে সরকারি সুবিধার সাথে সংযুক্ত করা। সহজ, দ্রুত এবং নিরাপদ।",
+
+                nav_home: "হোম",
+
+                nav_schemes: "প্রকল্প",
+
+                nav_dashboard: "ড্যাশবোর্ড",
+
+                nav_guide: "গাইড",
+
+                hdr_notifications: "বিজ্ঞপ্তি",
+
+                lbl_realtime: "রিয়েল-টাইম সতর্কতা সক্রিয়",
+
+                btn_clear_all: "সব মুছে ফেলুন",
+
+                lbl_phone: "মোবাইল নম্বর",
+
+                ph_phone: "উদাঃ 9876543210",
+
+                btn_get_otp: "ওটিপি পান",
+
+                msg_otp_sent: "আপনার মোবাইলে ওটিপি পাঠানো হয়েছে",
+
+                lbl_verify_otp: "ওটিপি যাচাই করুন",
+
+                btn_verify: "যাচাই করুন",
+
+                sec_recommended: "আপনার জন্য প্রস্তাবিত",
+
+                sec_documents: "নথির স্থিতি",
+
+                sec_tracker: "আবেদন ট্র্যাক করুন",
+
+                lbl_eligible: "যোগ্যতা",
+
+                lbl_deadline: "শেষ তারিখ",
+
+                lbl_benefits: "সুবিধা",
+
+                btn_apply: "এখন আবেদন করুন",
+
+                btn_save: "সংরক্ষণ",
+
+                btn_saved: "সংরক্ষিত",
+
+                status_submitted: "জমা দেওয়া হয়েছে",
+
+                status_review: "পর্যালোচনাধীন",
+
+                status_approved: "অনুমোদিত",
+
+                status_rejected: "প্রত্যাখ্যাত",
+
+                msg_sub_success: "সফলভাবে সাবস্ক্রাইব করা হয়েছে",
+
+                msg_doc_fetch: "নথি আনা হচ্ছে...",
+
+                msg_welcome_sms: "গ্রামসেতুতে স্বাগতম! প্রকল্পের আপডেটের জন্য এটি আপনার নিবন্ধিত নম্বর।",
+
+                lbl_days_left: "দিন বাকি",
+
+                lbl_verified: "যাচাইকৃত",
+
+                lbl_missing: "অনুপস্থিত",
+
+                lbl_connect_dl: "ডিজিলকার সংযোগ করুন",
+
+                desc_pm_kisan: "জমিদার কৃষক পরিবারকে বছরে ৬,০০০ টাকা আর্থিক সহায়তা।",
+
+                desc_ayushman: "পরিবার প্রতি বছরে ৫ লক্ষ টাকা পর্যন্ত স্বাস্থ্য বীমা কভারেজ।",
+
+                desc_soil: "ফলন উন্নত করতে আপনার মাটির পুষ্টির অবস্থা সম্পর্কে তথ্য পান।",
+
+                desc_atal: "অসংগঠিত খাতের নাগরিকদের জন্য পেনশন প্রকল্প।",
+
+                desc_awas: "গৃহহীনদের জন্য পাকা বাড়ি তৈরির জন্য আর্থিক সহায়তা।",
+
+                desc_kcc: "কৃষি প্রয়োজনে কৃষকদের সময়মতো ঋণ।",
+
+                step_1: "যোগ্যতা পরীক্ষা",
+
+                step_2: "সংযোগ করুন",
+
+                step_3: "আবেদন করুন",
+
+                msg_profile_update: "প্রোফাইল সফলভাবে আপডেট করা হয়েছে",
+
+                msg_app_submitted: "আবেদন সফলভাবে জমা দেওয়া হয়েছে! আইডি: ",
+
+                hdr_csc: "কাছাকাছি সেবা কেন্দ্র",
+
+                lbl_distance: "দূরত্ব",
+
+                lbl_open: "খোলা",
+
+                lbl_busy: "ব্যস্ত",
+
+                btn_view_map: "ম্যাপ দেখুন",
+
+                check_eligibility: "যোগ্যতা পরীক্ষা করুন",
+
+                btn_find: "আমার পরিকল্পনা খুঁজুন",
+
+                lbl_state: "রাজ্য",
+
+                lbl_inc: "বার্ষিক আয়",
+
+                lbl_occ: "পেশা",
+
+                lbl_age: "বয়স",
+
+                lbl_name: "পুরো নাম"
+
+            },
+
+
+
+            // --- MARATHI (mr) ---
+
+            mr: {
+
+                welcome: "ग्रामसेतू मध्ये आपले स्वागत आहे",
+
+                subtitle: "प्रत्येक गावाला सरकारी लाभांशी जोडणे. सोपे, जलद आणि सुरक्षित.",
+
+                nav_home: "होम",
+
+                nav_schemes: "योजना",
+
+                nav_dashboard: "डॅशबोर्ड",
+
+                nav_guide: "मदत",
+
+                hdr_notifications: "सूचना",
+
+                lbl_realtime: "रिअल-टाइम अलर्ट सक्रिय",
+
+                btn_clear_all: "सर्व साफ करा",
+
+                lbl_phone: "मोबाईल नंबर",
+
+                ph_phone: "उदा. 9876543210",
+
+                btn_get_otp: "ओटीपी मिळवा",
+
+                msg_otp_sent: "तुमच्या मोबाईलवर ओटीपी पाठवला आहे",
+
+                lbl_verify_otp: "ओटीपी सत्यापित करा",
+
+                btn_verify: "सत्यापित करा",
+
+                sec_recommended: "तुमच्यासाठी शिफारस केलेले",
+
+                sec_documents: "कागदपत्र स्थिती",
+
+                sec_tracker: "अर्ज ट्रॅक करा",
+
+                lbl_eligible: "पात्रता",
+
+                lbl_deadline: "अंतिम मुदत",
+
+                lbl_benefits: "फायदे",
+
+                btn_apply: "आत्ताच अर्ज करा",
+
+                btn_save: "सेव्ह करा",
+
+                btn_saved: "सेव्ह केले",
+
+                status_submitted: "सादर केले",
+
+                status_review: "पुनरावलोकनाधीन",
+
+                status_approved: "मंजूर",
+
+                status_rejected: "नाकारले",
+
+                msg_sub_success: "यशस्वीरित्या सदस्यता घेतली",
+
+                msg_doc_fetch: "कागदपत्रे आणत आहे...",
+
+                msg_welcome_sms: "ग्रामसेतू मध्ये स्वागत आहे! योजनांच्या अपडेटसाठी हा तुमचा नोंदणीकृत नंबर आहे.",
+
+                lbl_days_left: "दिवस बाकी",
+
+                lbl_verified: "सत्यापित",
+
+                lbl_missing: "गहाळ",
+
+                lbl_connect_dl: "डिजीलॉकर कनेक्ट करा",
+
+                desc_pm_kisan: "जमीनधारक शेतकरी कुटुंबांना वर्षाला ₹६,००० ची आर्थिक मदत.",
+
+                desc_ayushman: "प्रति कुटुंब प्रति वर्ष ₹५ लाख पर्यंतचे आरोग्य विमा कवच.",
+
+                desc_soil: "उत्पन्न वाढवण्यासाठी तुमच्या जमिनीच्या पोषक स्थितीबद्दल माहिती मिळवा.",
+
+                desc_atal: "असंघटित क्षेत्रातील नागरिकांसाठी पेन्शन योजना.",
+
+                desc_awas: "बेघर लोकांसाठी पक्के घर बांधण्यासाठी आर्थिक मदत.",
+
+                desc_kcc: "कृषी गरजांसाठी शेतकऱ्यांना वेळेवर कर्ज.",
+
+                step_1: "पात्रता तपासा",
+
+                step_2: "कनेक्ट करा",
+
+                step_3: "अर्ज करा",
+
+                msg_profile_update: "प्रोफाइल यशस्वीरित्या अपडेट केले",
+
+                msg_app_submitted: "अर्ज यशस्वीरित्या सादर केला! आयडी: ",
+
+                hdr_csc: "जवळचे सेवा केंद्र",
+
+                lbl_distance: "अंतर",
+
+                lbl_open: "उघडे",
+
+                lbl_busy: "व्यस्त",
+
+                btn_view_map: "नकाशा पहा",
+
+                check_eligibility: "पात्रता तपासा",
+
+                btn_find: "माझ्या योजना शोधा",
+
+                lbl_state: "राज्य",
+
+                lbl_inc: "वार्षिक उत्पन्न",
+
+                lbl_occ: "व्यवसाय",
+
+                lbl_age: "वय",
+
+                lbl_name: "पूर्ण नाव"
+
+            },
+
+
+
+            // --- TELUGU (te) ---
+
+            te: {
+
+                welcome: "గ్రామ్‌సేతుకి స్వాగతం",
+
+                subtitle: "ప్రతి గ్రామాన్ని ప్రభుత్వ ప్రయోజనాలకు అనుసంధానించడం. సులభం, వేగవంతం మరియు సురక్షితం.",
+
+                nav_home: "హోమ్",
+
+                nav_schemes: "పథకాలు",
+
+                nav_dashboard: "డ్యాష్‌బోర్డ్",
+
+                nav_guide: "గైడ్",
+
+                hdr_notifications: "నోటిఫికేషన్లు",
+
+                lbl_realtime: "రియల్ టైమ్ హెచ్చరికలు యాక్టివ్",
+
+                btn_clear_all: "అన్నీ క్లియర్ చేయండి",
+
+                lbl_phone: "మొబైల్ నంబర్",
+
+                ph_phone: "ఉదా. 9876543210",
+
+                btn_get_otp: "OTP పొందండి",
+
+                msg_otp_sent: "మీ మొబైల్‌కు OTP పంపబడింది",
+
+                lbl_verify_otp: "OTP ని నిర్ధారించండి",
+
+                btn_verify: "ధృవీకరించండి",
+
+                sec_recommended: "మీ కోసం సిఫార్సు చేయబడినవి",
+
+                sec_documents: "పత్రాల స్థితి",
+
+                sec_tracker: "అప్లికేషన్‌ను ట్రాక్ చేయండి",
+
+                lbl_eligible: "అర్హత",
+
+                lbl_deadline: "గడువు",
+
+                lbl_benefits: "ప్రయోజనాలు",
+
+                btn_apply: "ఇప్పుడే దరఖాస్తు చేయండి",
+
+                btn_save: "సేవ్ చేయండి",
+
+                btn_saved: "సేవ్ చేయబడింది",
+
+                status_submitted: "సమర్పించబడింది",
+
+                status_review: "సమీక్షలో ఉంది",
+
+                status_approved: "ఆమోదించబడింది",
+
+                status_rejected: "తిరస్కరించబడింది",
+
+                msg_sub_success: "విజయవంతంగా సభ్యత్వం పొందింది",
+
+                msg_doc_fetch: "పత్రాలను పొందుతోంది...",
+
+                msg_welcome_sms: "గ్రామ్‌సేతుకి స్వాగతం! పథకం నవీకరణల కోసం ఇది మీ రిజిస్టర్డ్ నంబర్.",
+
+                lbl_days_left: "రోజులు మిగిలి ఉన్నాయి",
+
+                lbl_verified: "ధృవీకరించబడింది",
+
+                lbl_missing: "లేవు",
+
+                lbl_connect_dl: "డిజీలాకర్‌ను కనెక్ట్ చేయండి",
+
+                desc_pm_kisan: "భూమి ఉన్న రైతు కుటుంబాలకు సంవత్సరానికి ₹6,000 ఆర్థిక సహాయం.",
+
+                desc_ayushman: "కుటుంబానికి సంవత్సరానికి ₹5 లక్షల వరకు ఆరోగ్య బీమా.",
+
+                desc_soil: "దిగుబడిని మెరుగుపరచడానికి మీ నేల పోషక స్థితి గురించి సమాచారాన్ని పొందండి.",
+
+                desc_atal: "అసంఘటిత రంగంలోని పౌరులకు పెన్షన్ పథకం.",
+
+                desc_awas: "నిరాశ్రయులకు పక్కా ఇల్లు నిర్మించుకోవడానికి ఆర్థిక సహాయం.",
+
+                desc_kcc: "వ్యవసాయ అవసరాల కోసం రైతులకు సకాలంలో రుణం.",
+
+                step_1: "అర్హతను తనిఖీ చేయండి",
+
+                step_2: "కనెక్ట్ చేయండి",
+
+                step_3: "దరఖాస్తు చేయండి",
+
+                msg_profile_update: "ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది",
+
+                msg_app_submitted: "దరఖాస్తు విజయవంతంగా సమర్పించబడింది! ID: ",
+
+                hdr_csc: "సమీప సేవా కేంద్రం",
+
+                lbl_distance: "దూరం",
+
+                lbl_open: "తెరిచి ఉంది",
+
+                lbl_busy: "బిజీ",
+
+                btn_view_map: "మ్యాప్ చూడండి",
+
+                check_eligibility: "అర్హతను తనిఖీ చేయండి",
+
+                btn_find: "నా పథకాలను కనుగొనండి",
+
+                lbl_state: "రాష్ట్రం",
+
+                lbl_inc: "వార్షిక ఆదాయం",
+
+                lbl_occ: "వృత్తి",
+
+                lbl_age: "వయస్సు",
+
+                lbl_name: "పూర్తి పేరు"
+
+            },
+
+            
+
+            // --- PUNJABI (pa) ---
+
+            pa: {
+
+                welcome: "ਗ੍ਰਾਮਸੇਤੂ ਵਿੱਚ ਜੀ ਆਇਆਂ ਨੂੰ",
+
+                subtitle: "ਹਰ ਪਿੰਡ ਨੂੰ ਸਰਕਾਰੀ ਲਾਭਾਂ ਨਾਲ ਜੋੜਨਾ। ਸਰਲ, ਤੇਜ਼ ਅਤੇ ਸੁਰੱਖਿਅਤ।",
+
+                nav_home: "ਹੋਮ",
+
+                nav_schemes: "ਸਕੀਮਾਂ",
+
+                nav_dashboard: "ਡੈਸ਼ਬੋਰਡ",
+
+                nav_guide: "ਮਦਦ",
+
+                hdr_notifications: "ਸੂਚਨਾਵਾਂ",
+
+                lbl_realtime: "ਰੀਅਲ-ਟਾਈਮ ਅਲਰਟ ਐਕਟਿਵ",
+
+                btn_clear_all: "ਸਭ ਸਾਫ਼ ਕਰੋ",
+
+                lbl_phone: "ਮੋਬਾਈਲ ਨੰਬਰ",
+
+                ph_phone: "ਉਦਾ. 9876543210",
+
+                btn_get_otp: "OTP ਪ੍ਰਾਪਤ ਕਰੋ",
+
+                msg_otp_sent: "ਤੁਹਾਡੇ ਮੋਬਾਈਲ 'ਤੇ OTP ਭੇਜਿਆ ਗਿਆ",
+
+                lbl_verify_otp: "OTP ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+
+                btn_verify: "ਪੁਸ਼ਟੀ ਕਰੋ",
+
+                sec_recommended: "ਤੁਹਾਡੇ ਲਈ ਸਿਫਾਰਸ਼ ਕੀਤੀਆਂ",
+
+                sec_documents: "ਦਸਤਾਵੇਜ਼ ਸਥਿਤੀ",
+
+                sec_tracker: "ਅਰਜ਼ੀ ਟ੍ਰੈਕ ਕਰੋ",
+
+                lbl_eligible: "ਯੋਗਤਾ",
+
+                lbl_deadline: "ਅੰਤਮ ਤਾਰੀਖ",
+
+                lbl_benefits: "ਲਾਭ",
+
+                btn_apply: "ਹੁਣੇ ਅਪਲਾਈ ਕਰੋ",
+
+                btn_save: "ਸੇਵ ਕਰੋ",
+
+                btn_saved: "ਸੇਵ ਕੀਤਾ",
+
+                status_submitted: "ਜਮ੍ਹਾਂ ਕੀਤਾ",
+
+                status_review: "ਸਮੀਖਿਆ ਅਧੀਨ",
+
+                status_approved: "ਮਨਜ਼ੂਰ",
+
+                status_rejected: "ਰੱਦ ਕੀਤਾ",
+
+                msg_sub_success: "ਸਫਲਤਾਪੂਰਵਕ ਸਬਸਕ੍ਰਾਈਬ ਕੀਤਾ",
+
+                msg_doc_fetch: "ਦਸਤਾਵੇਜ਼ ਲਿਆ ਰਿਹਾ ਹੈ...",
+
+                msg_welcome_sms: "ਗ੍ਰਾਮਸੇਤੂ ਵਿੱਚ ਜੀ ਆਇਆਂ ਨੂੰ! ਸਕੀਮ ਅਪਡੇਟਾਂ ਲਈ ਇਹ ਤੁਹਾਡਾ ਰਜਿਸਟਰਡ ਨੰਬਰ ਹੈ।",
+
+                lbl_days_left: "ਦਿਨ ਬਾਕੀ",
+
+                lbl_verified: "ਤਸਦੀਕਸ਼ੁਦਾ",
+
+                lbl_missing: "ਗੁੰਮ",
+
+                lbl_connect_dl: "ਡਿਜੀਲੌਕਰ ਕਨੈਕਟ ਕਰੋ",
+
+                desc_pm_kisan: "ਜ਼ਮੀਨ ਮਾਲਕ ਕਿਸਾਨ ਪਰਿਵਾਰਾਂ ਨੂੰ ਪ੍ਰਤੀ ਸਾਲ ₹6,000 ਦੀ ਵਿੱਤੀ ਸਹਾਇਤਾ।",
+
+                desc_ayushman: "ਪ੍ਰਤੀ ਪਰਿਵਾਰ ਪ੍ਰਤੀ ਸਾਲ ₹5 ਲੱਖ ਤੱਕ ਦਾ ਸਿਹਤ ਬੀਮਾ ਕਵਰ।",
+
+                desc_soil: "ਪੈਦਾਵਾਰ ਨੂੰ ਬਿਹਤਰ ਬਣਾਉਣ ਲਈ ਆਪਣੀ ਮਿੱਟੀ ਦੀ ਪੌਸ਼ਟਿਕ ਸਥਿਤੀ ਬਾਰੇ ਜਾਣਕਾਰੀ ਪ੍ਰਾਪਤ ਕਰੋ।",
+
+                desc_atal: "ਅਸੰਗਠਿਤ ਖੇਤਰ ਦੇ ਨਾਗਰਿਕਾਂ ਲਈ ਪੈਨਸ਼ਨ ਸਕੀਮ।",
+
+                desc_awas: "ਬੇਘਰੇ ਲੋਕਾਂ ਲਈ ਪੱਕਾ ਘਰ ਬਣਾਉਣ ਲਈ ਵਿੱਤੀ ਸਹਾਇਤਾ।",
+
+                desc_kcc: "ਖੇਤੀਬਾੜੀ ਲੋੜਾਂ ਲਈ ਕਿਸਾਨਾਂ ਨੂੰ ਸਮੇਂ ਸਿਰ ਕਰਜ਼ਾ।",
+
+                step_1: "ਯੋਗਤਾ ਚੈੱਕ ਕਰੋ",
+
+                step_2: "ਕਨੈਕਟ ਕਰੋ",
+
+                step_3: "ਅਪਲਾਈ ਕਰੋ",
+
+                msg_profile_update: "ਪ੍ਰੋਫਾਈਲ ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+
+                msg_app_submitted: "ਅਰਜ਼ੀ ਸਫਲਤਾਪੂਰਵਕ ਜਮ੍ਹਾਂ ਕੀਤੀ ਗਈ! ID: ",
+
+                hdr_csc: "ਨਜ਼ਦੀਕੀ ਸੇਵਾ ਕੇਂਦਰ",
+
+                lbl_distance: "ਦੂਰੀ",
+
+                lbl_open: "ਖੁੱਲ੍ਹਾ ਹੈ",
+
+                lbl_busy: "ਵਿਅਸਤ",
+
+                btn_view_map: "ਨਕਸ਼ਾ ਦੇਖੋ",
+
+                check_eligibility: "ਯੋਗਤਾ ਦੀ ਜਾਂਚ ਕਰੋ",
+
+                btn_find: "ਮੇਰੀਆਂ ਸਕੀਮਾਂ ਲੱਭੋ",
+
+                lbl_state: "ਰਾਜ",
+
+                lbl_inc: "ਸਲਾਨਾ ਆਮਦਨ",
+
+                lbl_occ: "ਕਿੱਤਾ",
+
+                lbl_age: "ਉਮਰ",
+
+                lbl_name: "ਪੂਰਾ ਨਾਮ"
+
+            },
+
+
+
+            // --- KANNADA (kn) ---
+
+            kn: {
+
+                welcome: "ಗ್ರಾಮ್‌ಸೇತುವಿಗೆ ಸುಸ್ವಾಗತ",
+
+                subtitle: "ಪ್ರತಿ ಹಳ್ಳಿಯನ್ನು ಸರ್ಕಾರಿ ಸೌಲಭ್ಯಗಳಿಗೆ ಸಂಪರ್ಕಿಸುವುದು. ಸರಳ, ವೇಗ ಮತ್ತು ಸುರಕ್ಷಿತ.",
+
+                nav_home: "ಮುಖಪುಟ",
+
+                nav_schemes: "ಯೋಜನೆಗಳು",
+
+                nav_dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+
+                nav_guide: "ಮಾರ್ಗದರ್ಶಿ",
+
+                hdr_notifications: "ಸೂಚನೆಗಳು",
+
+                lbl_realtime: "ರಿಯಲ್ ಟೈಮ್ ಎಚ್ಚರಿಕೆಗಳು ಸಕ್ರಿಯ",
+
+                btn_clear_all: "ಎಲ್ಲವನ್ನೂ ತೆರವುಗೊಳಿಸಿ",
+
+                lbl_phone: "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+
+                ph_phone: "ಉದಾ. 9876543210",
+
+                btn_get_otp: "OTP ಪಡೆಯಿರಿ",
+
+                msg_otp_sent: "ನಿಮ್ಮ ಮೊಬೈಲ್‌ಗೆ OTP ಕಳುಹಿಸಲಾಗಿದೆ",
+
+                lbl_verify_otp: "OTP ಪರಿಶೀಲಿಸಿ",
+
+                btn_verify: "ಪರಿಶೀಲಿಸಿ",
+
+                sec_recommended: "ನಿಮಗಾಗಿ ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ",
+
+                sec_documents: "ದಾಖಲೆ ಸ್ಥಿತಿ",
+
+                sec_tracker: "ಅರ್ಜಿ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
+
+                lbl_eligible: "ಅರ್ಹತೆ",
+
+                lbl_deadline: "ಕೊನೆಯ ದಿನಾಂಕ",
+
+                lbl_benefits: "ಪ್ರಯೋಜನಗಳು",
+
+                btn_apply: "ಈಗಲೇ ಅರ್ಜಿ ಹಾಕಿ",
+
+                btn_save: "ಉಳಿಸಿ",
+
+                btn_saved: "ಉಳಿಸಲಾಗಿದೆ",
+
+                status_submitted: "ಸಲ್ಲಿಸಲಾಗಿದೆ",
+
+                status_review: "ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ",
+
+                status_approved: "ಅನುಮೋದಿಸಲಾಗಿದೆ",
+
+                status_rejected: "ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
+
+                msg_sub_success: "ಯಶಸ್ವಿಯಾಗಿ ಚಂದಾದಾರರಾಗಿದ್ದೀರಿ",
+
+                msg_doc_fetch: "ದಾಖಲೆಗಳನ್ನು ಪಡೆಯಲಾಗುತ್ತಿದೆ...",
+
+                msg_welcome_sms: "ಗ್ರಾಮ್‌ಸೇತುವಿಗೆ ಸುಸ್ವಾಗತ! ಯೋಜನೆಗಳ ನವೀಕರಣಕ್ಕಾಗಿ ಇದು ನಿಮ್ಮ ನೋಂದಾಯಿತ ಸಂಖ್ಯೆ.",
+
+                lbl_days_left: "ದಿನಗಳು ಬಾಕಿ",
+
+                lbl_verified: "ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+
+                lbl_missing: "ಕಾಣೆಯಾಗಿದೆ",
+
+                lbl_connect_dl: "ಡಿಜಿಲಾಕರ್ ಸಂಪರ್ಕಿಸಿ",
+
+                desc_pm_kisan: "ಭೂಮಿ ಹೊಂದಿರುವ ರೈತ ಕುಟುಂಬಗಳಿಗೆ ವರ್ಷಕ್ಕೆ ₹6,000 ಆರ್ಥಿಕ ನೆರವು.",
+
+                desc_ayushman: "ಪ್ರತಿ ಕುಟುಂಬಕ್ಕೆ ವರ್ಷಕ್ಕೆ ₹5 ಲಕ್ಷದವರೆಗೆ ಆರೋಗ್ಯ ವಿಮೆ.",
+
+                desc_soil: "ಇಳುವರಿ ಸುಧಾರಿಸಲು ನಿಮ್ಮ ಮಣ್ಣಿನ ಪೋಷಕಾಂಶ ಸ್ಥಿತಿಯ ಬಗ್ಗೆ ಮಾಹಿತಿ ಪಡೆಯಿರಿ.",
+
+                desc_atal: "ಅಸಂಘಟಿತ ವಲಯದ ನಾಗರಿಕರಿಗೆ ಪಿಂಚಣಿ ಯೋಜನೆ.",
+
+                desc_awas: "ಮನೆ ಇಲ್ಲದವರಿಗೆ ಪಕ್ಕಾ ಮನೆ ನಿರ್ಮಿಸಲು ಆರ್ಥಿಕ ನೆರವು.",
+
+                desc_kcc: "ಕೃಷಿ ಅಗತ್ಯಗಳಿಗಾಗಿ ರೈತರಿಗೆ ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ಸಾಲ.",
+
+                step_1: "ಅರ್ಹತೆ ಪರಿಶೀಲಿಸಿ",
+
+                step_2: "ಸಂಪರ್ಕಿಸಿ",
+
+                step_3: "ಅರ್ಜಿ ಸಲ್ಲಿಸಿ",
+
+                msg_profile_update: "ಪ್ರೊಫೈಲ್ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ",
+
+                msg_app_submitted: "ಅರ್ಜಿ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಸಲಾಗಿದೆ! ID: ",
+
+                hdr_csc: "ಹತ್ತಿರದ ಸೇವಾ ಕೇಂದ್ರ",
+
+                lbl_distance: "ದೂರ",
+
+                lbl_open: "ತೆರೆದಿದೆ",
+
+                lbl_busy: "ಬಿಡುವಿಲ್ಲ",
+
+                btn_view_map: "ನಕ್ಷೆ ನೋಡಿ",
+
+                check_eligibility: "ಅರ್ಹತೆಯನ್ನು ಪರಿಶೀಲಿಸಿ",
+
+                btn_find: "ನನ್ನ ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಿ",
+
+                lbl_state: "ರಾಜ್ಯ",
+
+                lbl_inc: "ವಾರ್ಷಿಕ ಆದಾಯ",
+
+                lbl_occ: "ಉದ್ಯೋಗ",
+
+                lbl_age: "ವಯಸ್ಸು",
+
+                lbl_name: "ಪೂರ್ಣ ಹೆಸರು"
+
+            },
+
+
+
+            // --- MALAYALAM (ml) ---
+
+            ml: {
+
+                welcome: "ഗ്രാംസേതുവിലേക്ക് സ്വാഗതം",
+
+                subtitle: "ഓരോ ഗ്രാമത്തെയും സർക്കാർ ആനുകൂല്യങ്ങളുമായി ബന്ധിപ്പിക്കുന്നു. ലളിതം, വേഗത്തിൽ, സുരക്ഷിതം.",
+
+                nav_home: "ഹോം",
+
+                nav_schemes: "പദ്ധതികൾ",
+
+                nav_dashboard: "ഡാഷ്‌ബോർഡ്",
+
+                nav_guide: "സഹായം",
+
+                hdr_notifications: "അറിയിപ്പുകൾ",
+
+                lbl_realtime: "തത്സമയ അലേർട്ടുകൾ സജീവം",
+
+                btn_clear_all: "എല്ലാം മായ്‌ക്കുക",
+
+                lbl_phone: "മൊബൈൽ നമ്പർ",
+
+                ph_phone: "ഉദാ. 9876543210",
+
+                btn_get_otp: "OTP നേടുക",
+
+                msg_otp_sent: "നിങ്ങളുടെ മൊബൈലിൽ OTP അയച്ചു",
+
+                lbl_verify_otp: "OTP പരിശോധിക്കുക",
+
+                btn_verify: "പരിശോധിക്കുക",
+
+                sec_recommended: "നിങ്ങൾക്കായി ശുപാർശ ചെയ്യുന്നത്",
+
+                sec_documents: "രേഖകളുടെ നില",
+
+                sec_tracker: "അപേക്ഷ ട്രാക്ക് ചെയ്യുക",
+
+                lbl_eligible: "യോഗ്യത",
+
+                lbl_deadline: "അവസാന തീയതി",
+
+                lbl_benefits: "ആനുകൂല്യങ്ങൾ",
+
+                btn_apply: "ഇപ്പോൾ അപേക്ഷിക്കുക",
+
+                btn_save: "സേവ് ചെയ്യുക",
+
+                btn_saved: "സേവ് ചെയ്തു",
+
+                status_submitted: "സമർപ്പിച്ചു",
+
+                status_review: "പരിശോധനയിലാണ്",
+
+                status_approved: "അംഗീകരിച്ചു",
+
+                status_rejected: "നിരസിച്ചു",
+
+                msg_sub_success: "വിജയകരമായി വരിക്കാരായി",
+
+                msg_doc_fetch: "രേഖകൾ എടുക്കുന്നു...",
+
+                msg_welcome_sms: "ഗ്രാംസേതുവിലേക്ക് സ്വാഗതം! പദ്ധതി അപ്‌ഡേറ്റുകൾക്കുള്ള നിങ്ങളുടെ രജിസ്റ്റർ ചെയ്ത നമ്പറാണിത്.",
+
+                lbl_days_left: "ദിവസങ്ങൾ ബാക്കി",
+
+                lbl_verified: "പരിശോധിച്ചു",
+
+                lbl_missing: "ലഭ്യമല്ല",
+
+                lbl_connect_dl: "ഡിജിലോക്കർ കണക്ട് ചെയ്യുക",
+
+                desc_pm_kisan: "ഭൂമിയുള്ള കർഷക കുടുംബങ്ങൾക്ക് വർഷം ₹6,000 സാമ്പത്തിക സഹായം.",
+
+                desc_ayushman: "ഒരു കുടുംബത്തിന് വർഷം ₹5 ലക്ഷം വരെ ആരോഗ്യ ഇൻഷുറൻസ്.",
+
+                desc_soil: "വിളവ് മെച്ചപ്പെടുത്താൻ നിങ്ങളുടെ മണ്ണിന്റെ പോഷക നിലയെക്കുറിച്ച് അറിയുക.",
+
+                desc_atal: "അസംഘടിത മേഖലയിലെ പൗരന്മാർക്കുള്ള പെൻഷൻ പദ്ധതി.",
+
+                desc_awas: "ഭവനരഹിതർക്ക് വീട് നിർമ്മിക്കാൻ സാമ്പത്തിക സഹായം.",
+
+                desc_kcc: "കാർഷിക ആവശ്യങ്ങൾക്ക് കർഷകർക്ക് സമയബന്ധിതമായി വായ്പ.",
+
+                step_1: "യോഗ്യത പരിശോധിക്കുക",
+
+                step_2: "കണക്ട് ചെയ്യുക",
+
+                step_3: "അപേക്ഷിക്കുക",
+
+                msg_profile_update: "പ്രൊഫൈൽ വിജയകരമായി അപ്‌ഡേറ്റുചെയ്‌തു",
+
+                msg_app_submitted: "അപേക്ഷ വിജയകരമായി സമർപ്പിച്ചു! ID: ",
+
+                hdr_csc: "അടുത്തുള്ള സേവന കേന്ദ്രം",
+
+                lbl_distance: "ദൂരം",
+
+                lbl_open: "തുറന്നിരിക്കുന്നു",
+
+                lbl_busy: "തിരക്കിലാണ്",
+
+                btn_view_map: "മാപ്പ് കാണുക",
+
+                check_eligibility: "യോഗ്യത പരിശോധിക്കുക",
+
+                btn_find: "എന്റെ പദ്ധതികൾ കണ്ടെത്തുക",
+
+                lbl_state: "സംസ്ഥാനം",
+
+                lbl_inc: "വാർഷിക വരുമാനം",
+
+                lbl_occ: "തൊഴിൽ",
+
+                lbl_age: "വയസ്സ്",
+
+                lbl_name: "പൂർണ്ണ പേര്"
+
+            },
+
+
+
+            // --- GUJARATI (gu) ---
+
+            gu: {
+
+                welcome: "ગ્રામસેતુમાં તમારું સ્વાગત છે",
+
+                subtitle: "દરેક ગામને સરકારી લાભો સાથે જોડવું. સરળ, ઝડપી અને સુરક્ષિત.",
+
+                nav_home: "હોમ",
+
+                nav_schemes: "યોજનાઓ",
+
+                nav_dashboard: "ડેશબોર્ડ",
+
+                nav_guide: "માર્ગદર્શિકા",
+
+                hdr_notifications: "સૂચનાઓ",
+
+                lbl_realtime: "રીઅલ-ટાઇમ ચેતવણીઓ સક્રિય",
+
+                btn_clear_all: "બધું સાફ કરો",
+
+                lbl_phone: "મોબાઇલ નંબર",
+
+                ph_phone: "દા.ત. 9876543210",
+
+                btn_get_otp: "OTP મેળવો",
+
+                msg_otp_sent: "તમારા મોબાઇલ પર OTP મોકલવામાં આવ્યો છે",
+
+                lbl_verify_otp: "OTP ચકાસો",
+
+                btn_verify: "ચકાસો",
+
+                sec_recommended: "તમારા માટે ભલામણ કરેલ",
+
+                sec_documents: "દસ્તાવેજ સ્થિતિ",
+
+                sec_tracker: "અરજી ટ્રૅક કરો",
+
+                lbl_eligible: "પાત્રતા",
+
+                lbl_deadline: "છેલ્લી તારીખ",
+
+                lbl_benefits: "લાભો",
+
+                btn_apply: "હવે અરજી કરો",
+
+                btn_save: "સેવ કરો",
+
+                btn_saved: "સેવ કરેલું",
+
+                status_submitted: "સબમિટ કર્યું",
+
+                status_review: "સમીક્ષા હેઠળ",
+
+                status_approved: "મંજૂર",
+
+                status_rejected: "નકાર્યું",
+
+                msg_sub_success: "સફળતાપૂર્વક સબ્સ્ક્રાઇબ કર્યું",
+
+                msg_doc_fetch: "દસ્તાવેજો લાવી રહ્યું છે...",
+
+                msg_welcome_sms: "ગ્રામસેતુમાં સ્વાગત છે! યોજના અપડેટ્સ માટે આ તમારો નોંધાયેલ નંબર છે.",
+
+                lbl_days_left: "દિવસો બાકી",
+
+                lbl_verified: "ચકાસાયેલ",
+
+                lbl_missing: "ગુમ",
+
+                lbl_connect_dl: "ડિજીલોકર કનેક્ટ કરો",
+
+                desc_pm_kisan: "જમીન ધરાવતા ખેડૂત પરિવારોને વાર્ષિક ₹6,000 ની આર્થિક સહાય.",
+
+                desc_ayushman: "કુટુંબ દીઠ વાર્ષિક ₹5 લાખ સુધીનું સ્વાસ્થ્ય વીમા કવચ.",
+
+                desc_soil: "ઉપજ સુધારવા માટે તમારી જમીનની પોષક સ્થિતિ વિશે માહિતી મેળવો.",
+
+                desc_atal: "અસંગઠિત ક્ષેત્રના નાગરિકો માટે પેન્શન યોજના.",
+
+                desc_awas: "બેઘર લોકો માટે પાકું ઘર બનાવવા માટે આર્થિક સહાય.",
+
+                desc_kcc: "કૃષિ જરૂરિયાતો માટે ખેડૂતોને સમયસર લોન.",
+
+                step_1: "પાત્રતા તપાસો",
+
+                step_2: "કનેક્ટ કરો",
+
+                step_3: "અરજી કરો",
+
+                msg_profile_update: "પ્રોફાઇલ સફળતાપૂર્વક અપડેટ કરી",
+
+                msg_app_submitted: "અરજી સફળતાપૂર્વક સબમિટ કરી! ID: ",
+
+                hdr_csc: "નજીકનું સેવા કેન્દ્ર",
+
+                lbl_distance: "અંતર",
+
+                lbl_open: "ખુલ્લું છે",
+
+                lbl_busy: "વ્યસ્ત",
+
+                btn_view_map: "નકશો જુઓ",
+
+                check_eligibility: "પાત્રતા તપાસો",
+
+                btn_find: "મારી યોજનાઓ શોધો",
+
+                lbl_state: "રાજ્ય",
+
+                lbl_inc: "વાર્ષિક આવક",
+
+                lbl_occ: "વ્યવસાય",
+
+                lbl_age: "ઉંમર",
+
+                lbl_name: "પૂરું નામ"
+
+            }
+
+        };
+
+
+
+        const Expander = {
+
+            // ==========================================
+
+            // 1. EXTENDED STATE MANAGEMENT
+
+            // ==========================================
+
+            
+
+            // Override the getInitialState from the original class (simulated)
+
+            // Since we can't easily modify the class definition, we extend the 'store' instance directly
+
+            init: () => {
+
+                // Hijack store.state to include new fields if missing
+
+                if (!store.state.phoneNumber) store.state.phoneNumber = null;
+
+                if (!store.state.notifications) store.state.notifications = [];
+
+                
+
+                // Inject Phone Field into Views.home
+
+                Expander.patchHomeView();
+
+                
+
+                // Inject New Dashboard Features
+
+                Expander.patchDashboardView();
+
+
+
+                // Inject Notification Bell
+
+                Expander.injectNotificationBell();
+
+                
+
+                // Bind Translation Engine
+
+                const originalSetLang = app.setLanguage;
+
+                app.setLanguage = (lang) => {
+
+                    originalSetLang(lang);
+
+                    Expander.translateAll(lang);
+
+                };
+
+                
+
+                // Initial Translation
+
+                setTimeout(() => Expander.translateAll(store.state.settings.language), 500);
+
+
+
+                // Bind Mobile Nav
+
+                Expander.setupMobileNav();
+
+            },
+
+
+
+            // ==========================================
+
+            // 2. DOM INJECTION & PATCHING
+
+            // ==========================================
+
+
+
+            patchHomeView: () => {
+
+                // Redefine Views.home to include Phone Number and OTP logic
+
+                Views.home = () => `
+
+                    <div class="flex flex-col gap-10 fade-in pb-20">
+
+                        <section class="bg-gov-primary rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-lg">
+
+                            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+
+                            <h1 class="text-3xl md:text-5xl font-bold mb-4" data-translate="welcome">Welcome to GramSetu</h1>
+
+                            <p class="text-lg md:text-xl text-gov-soft mb-8 max-w-2xl mx-auto" data-translate="subtitle">Connecting Every Village to Government Benefits. Simple, Fast, and Secure.</p>
+
+                            
+
+                            <div class="flex flex-col md:flex-row gap-4 justify-center relative z-10">
+
+                                ${!store.state.user ? `
+
+                                    <button onclick="app.scrollToId('eligibility-form')" class="bg-white text-gov-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-gov-light shadow-lg transition transform hover:scale-105">
+
+                                        <i class="fas fa-search mr-2"></i> <span data-translate="step_1">Find My Schemes</span>
+
+                                    </button>
+
+                                ` : `
+
+                                    <button onclick="router.navigate('dashboard')" class="bg-white text-gov-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-gov-light shadow-lg transition">
+
+                                        <i class="fas fa-user mr-2"></i> <span data-translate="nav_dashboard">Go to Dashboard</span>
+
+                                    </button>
+
+                                `}
+
+                            </div>
+
+                        </section>
+
+
+
+                        ${!store.state.user ? `
+
+                        <section id="eligibility-form" class="bg-white p-6 md:p-10 rounded-2xl shadow-md border-t-4 border-gov-accent max-w-4xl mx-auto w-full">
+
+                            <h2 class="text-2xl font-bold text-gov-primary mb-6 flex items-center gap-2">
+
+                                <i class="fas fa-clipboard-check"></i> <span data-translate="check_eligibility">Check Your Eligibility</span>
+
+                            </h2>
+
+                            <form onsubmit="Expander.handleExtendedSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                <div>
+
+                                    <label class="block text-gray-700 font-bold mb-2" data-translate="lbl_name">Full Name</label>
+
+                                    <input type="text" name="name" required class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary focus:ring-1 focus:ring-gov-primary bg-gov-bg">
+
+                                </div>
+
+                                <div>
+
+                                    <label class="block text-gray-700 font-bold mb-2" data-translate="lbl_phone">Phone Number (Required for SMS)</label>
+
+                                    <div class="flex gap-2">
+
+                                        <span class="p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-500 font-bold">+91</span>
+
+                                        <input type="tel" name="phone" id="phoneInput" required pattern="[0-9]{10}" class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg" placeholder="9876543210">
+
+                                    </div>
+
+                                </div>
+
+                                <div>
+
+                                    <label class="block text-gray-700 font-bold mb-2" data-translate="lbl_age">Age</label>
+
+                                    <input type="number" name="age" required class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg">
+
+                                </div>
+
+                                <div>
+
+                                    <label class="block text-gray-700 font-bold mb-2" data-translate="lbl_occ">Occupation</label>
+
+                                    <select name="occupation" class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg">
+
+                                        <option value="Farmer">Farmer (Kisan)</option>
+
+                                        <option value="Laborer">Laborer</option>
+
+                                        <option value="Artisan">Artisan</option>
+
+                                        <option value="Student">Student</option>
+
+                                        <option value="Unemployed">Unemployed</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div>
+
+                                    <label class="block text-gray-700 font-bold mb-2" data-translate="lbl_inc">Annual Family Income (₹)</label>
+
+                                    <input type="number" name="income" required class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg">
+
+                                </div>
+
+                                <div class="md:col-span-2">
+
+                                    <label class="block text-gray-700 font-bold mb-2" data-translate="lbl_state">State</label>
+
+                                    <select name="state" class="w-full p-3 border border-gray-300 rounded-lg focus:border-gov-primary bg-gov-bg">
+
+                                        <option value="UP">Uttar Pradesh</option>
+
+                                        <option value="MP">Madhya Pradesh</option>
+
+                                        <option value="BH">Bihar</option>
+
+                                        <option value="MH">Maharashtra</option>
+
+                                        <option value="KA">Karnataka</option>
+
+                                        <option value="PB">Punjab</option>
+
+                                        <option value="GJ">Gujarat</option>
+
+                                        <option value="TN">Tamil Nadu</option>
+
+                                        <option value="WB">West Bengal</option>
+
+                                        <option value="KL">Kerala</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="md:col-span-2 mt-4">
+
+                                    <button type="submit" class="w-full bg-gov-primary text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-800 transition text-lg" data-translate="btn_find">
+
+                                        Check Eligible Schemes
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </section>
+
+                        ` : ''}
+
+
+
+                        <section class="mb-10">
+
+                            <h3 class="text-xl font-bold text-gray-700 mb-4 flex items-center gap-2" data-translate="hdr_csc"><i class="fas fa-map-marker-alt text-red-500"></i> Nearby Service Centers (CSC)</h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                                ${CSC_CENTERS.map(c => `
+
+                                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
+
+                                        <div>
+
+                                            <h4 class="font-bold text-gov-primary">${c.name}</h4>
+
+                                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full" data-translate="lbl_open">${c.status}</span>
+
+                                        </div>
+
+                                        <div class="text-right">
+
+                                            <div class="text-lg font-bold text-gray-600">${c.dist}</div>
+
+                                            <button class="text-xs text-blue-600 font-bold underline" data-translate="btn_view_map">Map</button>
+
+                                        </div>
+
+                                    </div>
+
+                                `).join('')}
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                `;
+
+            },
+
+
+
+            patchDashboardView: () => {
+
+                // Redefine Views.dashboard to include Document Panel and Progress Tracking
+
+                const originalDashboard = Views.dashboard;
+
+                Views.dashboard = () => {
+
+                    if(!store.state.user) return originalDashboard(); // Fallback if no user
+
+
+
+                    const subSchemes = store.state.subscriptions.map(id => SCHEMES_DB.find(s => s.id === id));
+
+                    
+
+                    return `
+
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 pb-20">
+
+                        <div class="lg:col-span-1">
+
+                            <div class="bg-white rounded-2xl shadow p-6 border-t-4 border-gov-primary">
+
+                                <div class="flex flex-col items-center text-center">
+
+                                    <div class="w-20 h-20 bg-gov-light rounded-full flex items-center justify-center text-3xl text-gov-primary mb-4">
+
+                                        <i class="fas fa-user"></i>
+
+                                    </div>
+
+                                    <h3 class="text-xl font-bold">${store.state.user.name}</h3>
+
+                                    <p class="text-gray-500">${store.state.user.occupation}</p>
+
+                                    <p class="text-gov-primary font-bold mt-2"><i class="fas fa-phone-alt"></i> +91 ${store.state.phoneNumber || 'Not Added'}</p>
+
+                                    <div class="w-full mt-6 border-t pt-4">
+
+                                        <div class="flex justify-between py-2 border-b">
+
+                                            <span class="text-gray-500" data-translate="lbl_age">Age</span>
+
+                                            <span class="font-bold">${store.state.user.age}</span>
+
+                                        </div>
+
+                                        <div class="flex justify-between py-2 border-b">
+
+                                            <span class="text-gray-500" data-translate="lbl_inc">Income</span>
+
+                                            <span class="font-bold">₹${store.state.user.income}</span>
+
+                                        </div>
+
+                                        <div class="flex justify-between py-2">
+
+                                            <span class="text-gray-500" data-translate="lbl_state">State</span>
+
+                                            <span class="font-bold">${store.state.user.state}</span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <button onclick="app.logout()" class="mt-6 w-full py-2 text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Log Out</button>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="bg-white rounded-2xl shadow p-6 mt-6">
+
+                                <h4 class="font-bold text-gray-700 mb-4" data-translate="sec_documents">Document Status</h4>
+
+                                <div class="flex flex-col">
+
+                                    ${Expander.renderDocStatus('Aadhaar Card', store.state.digiLocker.aadhaarVerified)}
+
+                                    ${Expander.renderDocStatus('Income Certificate', store.state.digiLocker.incomeVerified)}
+
+                                    ${Expander.renderDocStatus('Farmer ID', store.state.digiLocker.farmerVerified)}
+
+                                    ${Expander.renderDocStatus('Bank Passbook', true)}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="lg:col-span-3 flex flex-col gap-6">
+
+                            
+
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+
+                                <div class="flex items-center gap-4">
+
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Digital_India_logo.svg/1200px-Digital_India_logo.svg.png" class="h-12 w-auto object-contain">
+
+                                    <div>
+
+                                        <h3 class="font-bold text-lg" data-translate="lbl_connect_dl">DigiLocker Integration</h3>
+
+                                        <p class="text-sm text-gray-500">${store.state.digiLocker.connected ? '<span data-translate="lbl_verified">Verified</span>' : 'Connect to auto-verify eligibility'}</p>
+
+                                    </div>
+
+                                </div>
+
+                                ${store.state.digiLocker.connected 
+
+                                    ? `<span class="bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold flex items-center gap-2"><i class="fas fa-check-circle"></i> <span data-translate="lbl_verified">Connected</span></span>`
+
+                                    : `<button onclick="router.navigate('digilocker')" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700" data-translate="lbl_connect_dl">Connect Now</button>`
+
+                                }
+
+                            </div>
+
+
+
+                            <div class="bg-white p-6 rounded-2xl shadow-sm">
+
+                                <h3 class="text-xl font-bold text-gov-primary mb-6" data-translate="sec_tracker">Application Tracker</h3>
+
+                                ${store.state.applications.length === 0 ? 
+
+                                    `<p class="text-gray-500 italic">No active applications.</p>` :
+
+                                    store.state.applications.map(app => `
+
+                                        <div class="mb-8 last:mb-0">
+
+                                            <div class="flex justify-between mb-4">
+
+                                                <h4 class="font-bold text-lg">${app.schemeName}</h4>
+
+                                                <span class="text-sm font-mono bg-gray-100 px-2 rounded">ID: ${app.appId}</span>
+
+                                            </div>
+
+                                            <div class="timeline-v">
+
+                                                <div class="timeline-item completed">
+
+                                                    <div class="timeline-dot"></div>
+
+                                                    <p class="text-sm font-bold text-gray-800" data-translate="status_submitted">Submitted</p>
+
+                                                    <p class="text-xs text-gray-500">${new Date(app.date).toLocaleDateString()}</p>
+
+                                                </div>
+
+                                                <div class="timeline-item ${app.progress >= 2 ? 'completed' : 'current'}">
+
+                                                    <div class="timeline-dot"></div>
+
+                                                    <p class="text-sm font-bold text-gray-800" data-translate="status_review">Under Review</p>
+
+                                                    <p class="text-xs text-gray-500">Processing by District Officer</p>
+
+                                                </div>
+
+                                                <div class="timeline-item ${app.progress >= 3 ? 'completed' : ''}">
+
+                                                    <div class="timeline-dot"></div>
+
+                                                    <p class="text-sm font-bold text-gray-800" data-translate="status_approved">Approved</p>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    `).join('')
+
+                                }
+
+                            </div>
+
+
+
+                            <div>
+
+                                <h3 class="text-xl font-bold text-gov-primary mb-4" data-translate="sec_recommended">Subscribed Schemes</h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                    ${subSchemes.length === 0 ? 
+
+                                        '<p class="text-gray-500 italic">No saved schemes.</p>' :
+
+                                        subSchemes.map(s => {
+
+                                            const daysLeft = LogicEngine.calculateCountdown(s.deadline);
+
+                                            return `
+
+                                            <div class="bg-white p-4 rounded-xl border shadow-sm relative overflow-hidden">
+
+                                                <div class="absolute top-0 right-0 bg-gov-light p-2 rounded-bl-xl text-gov-primary">
+
+                                                    <i class="fas fa-bookmark"></i>
+
+                                                </div>
+
+                                                <h4 class="font-bold text-gray-800 pr-8" data-translate="desc_${s.id.split('-')[0]}">${s.name}</h4>
+
+                                                <p class="text-xs text-red-500 font-bold mt-2"><i class="far fa-clock"></i> ${daysLeft} <span data-translate="lbl_days_left">days left</span></p>
+
+                                                <div class="mt-4 flex gap-2">
+
+                                                    <button onclick="app.initApply('${s.id}')" class="flex-1 bg-gov-primary text-white text-sm py-2 rounded hover:bg-green-800" data-translate="btn_apply">Apply Now</button>
+
+                                                </div>
+
+                                            </div>
+
+                                            `
+
+                                        }).join('')
+
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>`;
+
+                };
+
+            },
+
+
+
+            renderDocStatus: (name, verified) => `
+
+                <div class="doc-status-row">
+
+                    <div class="flex items-center">
+
+                        <div class="doc-icon text-${verified ? 'green' : 'gray'}-600">
+
+                            <i class="fas fa-${verified ? 'check-circle' : 'file'}"></i>
+
+                        </div>
+
+                        <div>
+
+                            <p class="text-sm font-bold text-gray-700">${name}</p>
+
+                            <p class="text-xs text-${verified ? 'green' : 'red'}-500">${verified ? 'Verified' : 'Missing'}</p>
+
+                        </div>
+
+                    </div>
+
+                    ${verified ? '' : '<button class="text-xs text-blue-600 underline">Upload</button>'}
+
+                </div>
+
+            `,
+
+
+
+            injectNotificationBell: () => {
+
+                const authSection = document.querySelector('.flex.items-center.gap-4');
+
+                // Find language selector container
+
+                const langContainer = document.querySelector('#languageSelector').parentNode;
+
+                
+
+                // Add Bell Button
+
+                const bellBtn = document.createElement('button');
+
+                bellBtn.className = "relative p-2 text-gov-primary hover:text-gov-accent hidden md:block";
+
+                bellBtn.onclick = Expander.toggleNotifications;
+
+                bellBtn.innerHTML = `
+
+                    <i class="fas fa-bell text-xl"></i>
+
+                    <span id="desktop-badge" class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white hidden"></span>
+
+                `;
+
+                langContainer.parentNode.insertBefore(bellBtn, langContainer);
+
+            },
+
+
+
+            // ==========================================
+
+            // 3. LOGIC HANDLERS
+
+            // ==========================================
+
+
+
+            handleExtendedSubmit: (e) => {
+
+                e.preventDefault();
+
+                const fd = new FormData(e.target);
+
+                
+
+                // Save Phone Number
+
+                const phone = fd.get('phone');
+
+                store.state.phoneNumber = phone;
+
+                store.saveState();
+
+                
+
+                // Simulate SMS Welcome
+
+                setTimeout(() => {
+
+                    Expander.sendRealTimeSMS("GramSetu: Welcome! Your profile is linked to +91-" + phone);
+
+                }, 3000);
+
+
+
+                // Call original handler logic
+
+                app.handleProfileSubmit(e);
+
+            },
+
+
+
+            sendRealTimeSMS: (text) => {
+
+                const container = document.getElementById('sms-simulation-layer');
+
+                const toast = document.createElement('div');
+
+                toast.className = 'sms-toast';
+
+                toast.innerHTML = `
+
+                    <div class="bg-green-100 p-2 rounded-full text-green-700">
+
+                        <i class="fas fa-comment-dots"></i>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Message now</p>
+
+                        <p class="text-sm font-medium leading-snug">${text}</p>
+
+                    </div>
+
+                `;
+
+                container.appendChild(toast);
+
+                
+
+                // Play sound
+
+                Expander.playNotificationSound();
+
+
+
+                // Auto remove
+
+                setTimeout(() => {
+
+                    toast.classList.add('hide');
+
+                    setTimeout(() => toast.remove(), 600);
+
+                }, 6000);
+
+
+
+                // Add to history
+
+                store.addNotification(text);
+
+                Expander.updateNotificationBadge();
+
+                Expander.renderNotifications();
+
+            },
+
+
+
+            playNotificationSound: () => {
+
+                // Visual cue is sufficient for prototype
+
+            },
+
+
+
+            toggleNotifications: () => {
+
+                const panel = document.getElementById('notification-panel');
+
+                panel.classList.toggle('active');
+
+                // Clear badge on open
+
+                if (panel.classList.contains('active')) {
+
+                     document.getElementById('desktop-badge').classList.add('hidden');
+
+                     document.getElementById('mobile-badge').classList.add('hidden');
+
+                }
+
+                Expander.renderNotifications();
+
+            },
+
+
+
+            renderNotifications: () => {
+
+                const container = document.getElementById('notif-list-container');
+
+                const list = store.state.notifications;
+
+                
+
+                if (list.length === 0) {
+
+                    container.innerHTML = `<div class="text-center p-10 text-gray-400"><i class="fas fa-bell-slash text-3xl mb-2"></i><br>No new notifications</div>`;
+
+                    return;
+
+                }
+
+
+
+                container.innerHTML = list.map(n => `
+
+                    <div class="notif-item ${n.msg.includes('Apply') ? 'success' : 'info'}">
+
+                        <p class="text-sm font-medium text-gray-800">${n.msg}</p>
+
+                        <span class="text-xs text-gray-400 mt-1 block">${new Date(n.date).toLocaleTimeString()}</span>
+
+                    </div>
+
+                `).join('');
+
+            },
+
+
+
+            clearNotifications: () => {
+
+                store.state.notifications = [];
+
+                store.saveState();
+
+                Expander.renderNotifications();
+
+                Expander.updateNotificationBadge();
+
+            },
+
+
+
+            updateNotificationBadge: () => {
+
+                const count = store.state.notifications.filter(n => !n.read).length; // Simplified
+
+                const dBadge = document.getElementById('desktop-badge');
+
+                const mBadge = document.getElementById('mobile-badge');
+
+                if (count > 0 || store.state.notifications.length > 0) {
+
+                    dBadge.classList.remove('hidden');
+
+                    mBadge.classList.remove('hidden');
+
+                } else {
+
+                    dBadge.classList.add('hidden');
+
+                    mBadge.classList.add('hidden');
+
+                }
+
+            },
+
+
+
+            // ==========================================
+
+            // 4. OMNI-LINGUAL TRANSLATION ENGINE
+
+            // ==========================================
+
+
+
+            translateAll: (lang) => {
+
+                if (!DICTIONARY[lang]) return; // Fallback to English existing
+
+
+
+                const dict = DICTIONARY[lang];
+
+                
+
+                // 1. Translate data-translate attributes
+
+                document.querySelectorAll('[data-translate]').forEach(el => {
+
+                    const key = el.getAttribute('data-translate');
+
+                    if (dict[key]) el.innerText = dict[key];
+
+                });
+
+
+
+                // 2. Translate Input Placeholders
+
+                const phMap = {
+
+                    'phone': dict.ph_phone,
+
+                    'name': dict.lbl_name,
+
+                    'age': dict.lbl_age,
+
+                    'income': dict.lbl_inc
+
+                };
+
+                
+
+                document.querySelectorAll('input').forEach(el => {
+
+                    if (phMap[el.name]) el.placeholder = phMap[el.name];
+
+                });
+
+            },
+
+
+
+            setupMobileNav: () => {
+
+                // Highlight active link logic
+
+                const updateNav = () => {
+
+                    document.querySelectorAll('.mobile-nav-item').forEach(el => {
+
+                        el.classList.remove('active');
+
+                        if (el.getAttribute('onclick').includes(Router.currentRoute)) {
+
+                            el.classList.add('active');
+
+                        }
+
+                    });
+
+                };
+
+                
+
+                // Hook into Router.navigate
+
+                const originalNavigate = Router.navigate;
+
+                Router.navigate = (route) => {
+
+                    originalNavigate(route);
+
+                    updateNav();
+
+                    Expander.translateAll(store.state.settings.language); // Ensure translation persists on nav
+
+                };
+
+            }
+
+        };
+
+
+
+        // Initialize Expansion Pack
+
+        setTimeout(() => {
+
+            Expander.init();
+
+            console.log("GramSetu Core 2.0 Loaded Successfully");
+
+        }, 100);
+
+
+
+        // Hijack Subscribe to Trigger Real SMS
+
+        const originalSubscribe = store.subscribe;
+
+        store.subscribe = function(schemeId) {
+
+            if (!this.state.subscriptions.includes(schemeId)) {
+
+                this.state.subscriptions.push(schemeId);
+
+                const schemeName = SCHEMES_DB.find(s=>s.id===schemeId).name;
+
+                
+
+                // Original Notification
+
+                this.addNotification(`Subscribed to ${schemeName}`);
+
+                
+
+                // New SMS
+
+                Expander.sendRealTimeSMS(`GramSetu: You have subscribed to ${schemeName}. We will notify you when applications open.`);
+
+                
+
+                this.saveState();
+
+            }
+
+        };
+/* ==========================================
+   FULL TRANSLATION ENFORCER ENGINE
+   APPEND ONLY — NO EXISTING CODE MODIFIED
+========================================== */
+
+const TranslationEnforcer = {
+
+    currentLang: null,
+
+    init() {
+        this.currentLang = store.state.settings.language || 'en';
+
+        this.hookLanguageChange();
+        this.hookRouter();
+        this.monitor();
+
+        setTimeout(() => this.forceTranslateAll(), 500);
+    },
+
+    forceTranslateAll() {
+
+        const lang = store.state.settings.language;
+        if (!lang || lang === 'en') return;
+
+        const dict = {
+            ...(TRANSLATIONS[lang] || {}),
+            ...(DICTIONARY[lang] || {})
+        };
+
+        document.querySelectorAll("*").forEach(el => {
+
+            this.translateElement(el, dict);
+            this.translateAttributes(el, dict);
+
+        });
+
+    },
+
+    translateElement(el, dict) {
+
+        el.childNodes.forEach(node => {
+
+            if (node.nodeType === Node.TEXT_NODE) {
+
+                const text = node.textContent.trim();
+
+                if (!text) return;
+
+                for (const key in dict) {
+
+                    if (dict[key] === text) return;
+
+                }
+
+                const match = this.findMatch(text, dict);
+
+                if (match) node.textContent = match;
+
+            }
+
+        });
+
+    },
+
+    translateAttributes(el, dict) {
+
+        const attrs = ['placeholder','title','aria-label'];
+
+        attrs.forEach(attr => {
+
+            const val = el.getAttribute(attr);
+            if (!val) return;
+
+            const match = this.findMatch(val, dict);
+            if (match) el.setAttribute(attr, match);
+
+        });
+
+    },
+
+    findMatch(text, dict) {
+
+        const norm = text.toLowerCase();
+
+        for (const key in dict) {
+
+            if (key.toLowerCase().includes(norm) ||
+                norm.includes(key.toLowerCase())) {
+
+                return dict[key];
+
+            }
+
+        }
+
+        return null;
+    },
+
+    hookLanguageChange() {
+
+        const originalSetLang = app.setLanguage;
+
+        app.setLanguage = (lang) => {
+
+            originalSetLang(lang);
+
+            setTimeout(() => {
+                this.forceTranslateAll();
+            }, 100);
+
+        };
+
+    },
+
+    hookRouter() {
+
+        const originalNavigate = Router.navigate;
+
+        Router.navigate = (route) => {
+
+            originalNavigate(route);
+
+            setTimeout(() => {
+                this.forceTranslateAll();
+            }, 100);
+
+        };
+
+    },
+
+    monitor() {
+
+        setInterval(() => {
+
+            if (store.state.settings.language !== 'en') {
+
+                this.forceTranslateAll();
+
+            }
+
+        }, 500);
+
+    }
+
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    TranslationEnforcer.init();
+    /* ==========================================
+   TRANSLATION ENFORCER SAFE PATCH
+   APPEND ONLY FIX — DO NOT MODIFY EXISTING ENGINE
+========================================== */
+
+const TranslationSafetyPatch = {
+
+    init() {
+
+        this.patchTranslateElement();
+
+        // Run once immediately
+        this.applyNoTranslateProtection();
+
+        // Run continuously to protect dynamic elements
+        setInterval(() => {
+            this.applyNoTranslateProtection();
+        }, 500);
+
+    },
+
+    patchTranslateElement() {
+
+        // Store original function
+        const originalTranslateElement = TranslationEnforcer.translateElement;
+
+        // Override safely
+        TranslationEnforcer.translateElement = function(el, dict) {
+
+            // Skip protected elements
+            if (TranslationSafetyPatch.isProtected(el)) return;
+
+            el.childNodes.forEach(node => {
+
+                if (node.nodeType === Node.TEXT_NODE) {
+
+                    // Skip protected parent
+                    if (node.parentElement && TranslationSafetyPatch.isProtected(node.parentElement)) return;
+
+                    const text = node.textContent.trim();
+
+                    // CRITICAL: Skip numbers completely
+                    if (/^[0-9]+$/.test(text)) return;
+
+                    // Skip empty
+                    if (!text) return;
+
+                    const match = TranslationEnforcer.findMatch(text, dict);
+
+                    if (match) {
+                        node.textContent = match;
+                    }
+
+                }
+
+            });
+
+        };
+
+    },
+
+    isProtected(el) {
+
+        if (!el) return false;
+
+        // Skip elements marked explicitly
+        if (el.hasAttribute && el.hasAttribute('data-no-translate')) return true;
+
+        // Skip timeline number circles
+        if (el.classList &&
+            el.classList.contains('rounded-full') &&
+            el.classList.contains('flex') &&
+            el.classList.contains('items-center') &&
+            el.classList.contains('justify-center')) {
+
+            return true;
+        }
+
+        return false;
+    },
+
+    applyNoTranslateProtection() {
+
+        document.querySelectorAll('.rounded-full.flex.items-center.justify-center')
+        .forEach(el => {
+
+            if (/^[0-9]+$/.test(el.innerText.trim())) {
+
+                el.setAttribute('data-no-translate', 'true');
+
+            }
+
+        });
+
+    }
+
+};
+
+// Initialize patch AFTER TranslationEnforcer
+setTimeout(() => {
+    TranslationSafetyPatch.init();
+    console.log("Translation Safety Patch Active");
+}, 1000);
+});
+
+    </script>
+
+</body>
+
+</html>
